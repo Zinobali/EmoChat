@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginDialog</class>
+ <widget class="QDialog" name="LoginDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>270</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>270</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">#frame{
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 lightblue, stop:1 #fbf4ff);
+	font-size:15px;
+	font-style:MingLiU-ExtB;
+	border-radius:10px;
+}
+
+</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="signUpLabel">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>248</y>
+      <width>108</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>没有账号，前去注册</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="closeBtn">
+    <property name="geometry">
+     <rect>
+      <x>365</x>
+      <y>0</y>
+      <width>35</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: none;
+    background: transparent;
+	border-top-right-radius: 10px; /* 设置右上角的圆角半径 */
+    border-top-left-radius: 0px; /* 设置左上角直角 */
+    border-bottom-right-radius: 0px; /* 设置右下角直角 */
+    border-bottom-left-radius: 0px; /* 设置左下角直角 */
+}
+QPushButton:hover {
+    background-color: red;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="inputWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>91</x>
+      <y>30</y>
+      <width>218</width>
+      <height>213</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit{
+	color: rgb(54, 54, 54);
+	font-size:16px;
+	border-style:outset;
+	border-radius:10px;
+	font-style:MingLiU-ExtB;
+}
+
+QPushButton{
+	background:#ced1d8;
+	border-style:outset;
+	border-radius:10px;
+	font-size:16px;
+	font-style:MingLiU-ExtB;
+}
+
+QPushButton:hover {
+    background-color: pink;
+}
+
+QPushButton:pressed{
+	background-color:rgb(224,0,0);
+	border-style:inset;
+	font-style:MingLiU-ExtB;
+}
+
+QCheckBox{
+	background:rgba(85,170,255,0);
+	color:black;
+	font-style:MingLiU-ExtB;
+	font-size:14px;
+}
+
+QLabel{
+	background:rgba(85,170,255,0);
+	color:black;
+	font-style:MingLiU-ExtB;
+	font-size:14px;
+}</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLineEdit" name="usrLineEdit">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="placeholderText">
+        <string>用户名</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>10</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="pwdLineEdit">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="placeholderText">
+        <string>密   码</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>10</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QCheckBox" name="rembrCheckBox">
+         <property name="text">
+          <string>记住我</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="forgetPwdLabel">
+         <property name="text">
+          <string>忘记密码</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="signInBtn">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>登录</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

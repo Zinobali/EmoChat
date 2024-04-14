@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>img/ultraman.png</file>
+        <file>img/avatar1.jpg</file>
+        <file>img/avatar2.jpg</file>
+    </qresource>
+</RCC>
