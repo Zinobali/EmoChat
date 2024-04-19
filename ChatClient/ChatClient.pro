@@ -9,8 +9,12 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    chatlistdelegate.cpp \
+    chatlistview.cpp \
+    chatwidget.cpp \
     commonutils.cpp \
-    friendlistitem.cpp \
+    friendlistdelegate.cpp \
+    friendlistview.cpp \
     jsonmanager.cpp \
     logindialog.cpp \
     main.cpp \
@@ -22,8 +26,12 @@ SOURCES += \
     user.cpp
 
 HEADERS += \
+    chatlistdelegate.h \
+    chatlistview.h \
+    chatwidget.h \
     commonutils.h \
-    friendlistitem.h \
+    friendlistdelegate.h \
+    friendlistview.h \
     jsonmanager.h \
     logindialog.h \
     mainwindow.h \
@@ -34,7 +42,7 @@ HEADERS += \
     user.h
 
 FORMS += \
-    friendlistitem.ui \
+    chatwidget.ui \
     logindialog.ui \
     mainwindow.ui \
     signupdialog.ui

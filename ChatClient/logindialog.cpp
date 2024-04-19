@@ -38,9 +38,9 @@ LoginDialog::LoginDialog(QWidget *parent)
         qDebug() << "连接服务器成功";
         // connect(m_socket, &MsgSocket::readyRead, this, &LoginDialog::handleMessage);
         connect(m_socket, &MsgSocket::messageReady, this, &LoginDialog::processMessage);
-        connect(m_socket, &MsgSocket::disconnected, [=]()
-                {
+        connect(m_socket, &MsgSocket::disconnected, [=](){
             m_socket->deleteLater();
+            m_socket = nullptr;
             qDebug() << "服务器关闭"; });
     }
     else
@@ -53,6 +53,11 @@ LoginDialog::LoginDialog(QWidget *parent)
 LoginDialog::~LoginDialog()
 {
     delete ui;
+    if(m_socket!= nullptr)
+    {
+        delete m_socket;
+        m_socket = nullptr;
+    }
 }
 
 void LoginDialog::SignIn()
@@ -87,6 +92,7 @@ void LoginDialog::processMessage(qint64 type, QByteArray data)
         if (signInReply->isValid())
         {
             emit loginSuccess(signInReply->user(), m_socket);
+            m_socket = nullptr;
             // qDebug() << "登录窗口输出：";
             // qDebug() << "user" << signInReply->user().id();
             // qDebug() << "user" << signInReply->user().username();

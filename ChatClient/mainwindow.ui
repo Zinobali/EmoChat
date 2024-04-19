@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>503</height>
+    <height>551</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,7 +106,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QTableWidget" name="userListTableWidget">
+       <widget class="FriendListView" name="friendsListView">
         <property name="geometry">
          <rect>
           <x>60</x>
@@ -126,115 +126,80 @@
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
-        <property name="showGrid">
-         <bool>false</bool>
-        </property>
-        <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>250</number>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
        </widget>
-       <widget class="QWidget" name="widget" native="true">
+       <widget class="QLabel" name="avatarLabel">
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>10</y>
-          <width>191</width>
-          <height>51</height>
+          <x>5</x>
+          <y>5</y>
+          <width>50</width>
+          <height>50</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="avatarLabel">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Sunken</enum>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>17</width>
-               <height>5</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="userNameLabel">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>80</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>用户名</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>17</width>
-               <height>5</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-        </layout>
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="userNameLabel">
+        <property name="geometry">
+         <rect>
+          <x>65</x>
+          <y>20</y>
+          <width>80</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>用户名</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>80</y>
+          <width>50</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>测试</string>
+        </property>
        </widget>
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="chatWidget" native="true">
+      <widget class="QStackedWidget" name="chatStackedWidget">
        <property name="minimumSize">
         <size>
          <width>431</width>
@@ -247,128 +212,21 @@
          <height>501</height>
         </size>
        </property>
-       <widget class="QLabel" name="friendNameLabel">
-        <property name="geometry">
-         <rect>
-          <x>1</x>
-          <y>1</y>
-          <width>121</width>
-          <height>62</height>
-         </rect>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
+       <widget class="QWidget" name="chatDefaultPage">
+        <widget class="QLabel" name="label_3">
+         <property name="geometry">
+          <rect>
+           <x>140</x>
+           <y>240</y>
+           <width>151</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>双击好友头像进行对话</string>
+         </property>
+        </widget>
        </widget>
-       <widget class="QLabel" name="label_4">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>432</width>
-          <height>65</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(190, 190, 190);</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QTextBrowser" name="chatTextBrowser">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>65</y>
-          <width>431</width>
-          <height>300</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="transPushButton">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>375</y>
-          <width>31</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>传</string>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_5">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>365</y>
-          <width>432</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(202, 202, 202);</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="chatTextEdit">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>403</y>
-          <width>431</width>
-          <height>97</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="sendPushButton">
-        <property name="geometry">
-         <rect>
-          <x>355</x>
-          <y>476</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>发  送(S)</string>
-        </property>
-       </widget>
-       <zorder>label_4</zorder>
-       <zorder>chatTextBrowser</zorder>
-       <zorder>label_5</zorder>
-       <zorder>chatTextEdit</zorder>
-       <zorder>sendPushButton</zorder>
-       <zorder>friendNameLabel</zorder>
-       <zorder>transPushButton</zorder>
       </widget>
      </item>
     </layout>
@@ -386,6 +244,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FriendListView</class>
+   <extends>QListView</extends>
+   <header>friendlistview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -7,7 +7,11 @@
 #include "messageprocessor.h"
 #include <QThread>
 #include <QTableWidget>
-#include "friendlistitem.h"
+#include "chatwidget.h"
+#include <QFileDialog>
+#include <QImage>
+#include <QBuffer>
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -25,25 +29,32 @@ public:
     ~MainWindow();
 
     void test();
-    void loginSuccessSlot(User user,MsgSocket *socket);
+    void loginSuccessSlot(User user, MsgSocket *socket);
     void initUserInfo();
     void processMessage(qint64 type, QByteArray data);
     void initThread();
     void sendOnlineMessage();
 
 private:
-    void textMessageSlot(int,QString);
+    void initUI();
+    
+private slots:
+    void textMessageSlot(int, QString);
     void updateFriendList(QVector<User> friends);
     void itemDoubleClickedSlot(QTableWidgetItem *item);
+    void onItemDoubleClicked(const QModelIndex &index);
     void sendPushButtonSlot();
     void setReddot(int id);
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
     MsgSocket *m_socket;
-    User m_user;
-    QVector<User> m_friends;
+    std::shared_ptr<User> m_user;
+    // User m_user;
+    // QVector<User> m_friends;
     QPixmap m_defaultAvatar;
-    QMultiMap<int,QString> m_messages;
+    QMultiMap<int, QString> m_messages;
 };
 #endif // MAINWINDOW_H

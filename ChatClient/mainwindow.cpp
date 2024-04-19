@@ -5,25 +5,24 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->userListTableWidget->setColumnCount(1);
-    ui->userListTableWidget->setIconSize(QSize(60,60));
-    // ui->userListTableWidget行高设置70
-    ui->userListTableWidget->verticalHeader()->setDefaultSectionSize(70);
-    // ui->userListTableWidget第一列宽度设置
-    ui->userListTableWidget->setColumnWidth(0, 250);
-    // 禁用userListTableWidget编辑
-    ui->userListTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_socket = nullptr;
+    initUI();
+    test();
+    // ui->userListTableWidget->setColumnCount(1);
+    // ui->userListTableWidget->setIconSize(QSize(60,60));
+    // ui->userListTableWidget->verticalHeader()->setDefaultSectionSize(70);
+    // ui->userListTableWidget->setColumnWidth(0, 250);
+    // ui->userListTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // 默认头像
     m_defaultAvatar = QPixmap(":/icon/img/ultraman.png").scaled(ui->avatarLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->chatWidget->setEnabled(false);
-    //隐藏子控件
-    // ui->chatWidget->hide();
-    // 发送消息按钮信号槽连接
-    connect(ui->sendPushButton, &QPushButton::clicked, this, &MainWindow::sendPushButtonSlot);
-    //ui->transPushButton设置图标为： QStyle::SP_FileIcon
-    ui->transPushButton->setIcon(style()->standardIcon(QStyle::SP_DirIcon));
-    //隐藏状态栏
-    ui->statusbar->hide();
+    ui->chatDefaultPage->setEnabled(false);
+    // 隐藏子控件
+    //  ui->chatWidget->hide();
+    //  发送消息按钮信号槽连接
+    // connect(ui->sendPushButton, &QPushButton::clicked, this, &MainWindow::sendPushButtonSlot);
+
+    // 测试
+    connect(ui->friendsListView, &FriendListView::doubleClicked, this, &MainWindow::onItemDoubleClicked);
 }
 
 MainWindow::~MainWindow()
@@ -37,22 +36,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::test()
 {
-    qDebug() << "mainwindow输出";
-    qDebug() << "user" << m_user.id();
-    qDebug() << "user" << m_user.username();
-    qDebug() << "socket" << m_socket->socketDescriptor();
+    m_user = std::make_shared<User>(1, "张三", "123", "");
+    // qDebug() << "m_user->id(): " <<  m_user->id();
 }
 
 void MainWindow::loginSuccessSlot(User user, MsgSocket *socket) // 相当于构造函数
 {
-    m_user = user;
+    m_user = std::make_shared<User>(user);
     m_socket = socket;
-    setWindowTitle("当前登录用户："+m_user.username());
+    setWindowTitle("当前登录用户：" + m_user->username());
     connect(m_socket, &MsgSocket::disconnected, this, [=]()
             {
                 m_socket->deleteLater();
                 m_socket = nullptr; });
-    // test();
     sendOnlineMessage();
     initUserInfo();
     initThread();
@@ -67,15 +63,15 @@ void MainWindow::initUserInfo()
 {
     // if (m_user.avatar().isEmpty())
     // {
-        // ui->avatarLabel->setPixmap(m_defaultAvatar);
+    // ui->avatarLabel->setPixmap(m_defaultAvatar);
     // }
     // else
     // {
     //     // 读头像
     // }
-    QPixmap pixmap = QPixmap(QString(":/icon/img/avatar%1.jpg").arg(m_user.id())).scaled(ui->avatarLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap = QPixmap(QString(":/icon/img/avatar%1.jpg").arg(m_user->id())).scaled(ui->avatarLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->avatarLabel->setPixmap(pixmap);
-    ui->userNameLabel->setText(m_user.username());
+    ui->userNameLabel->setText(m_user->username());
 }
 
 void MainWindow::initThread()
@@ -91,14 +87,50 @@ void MainWindow::initThread()
 
 void MainWindow::sendOnlineMessage()
 {
-    onlineMessage *msg = new onlineMessage(m_user.id(), Message::SYSTEM_ID);
+    onlineMessage *msg = new onlineMessage(m_user->id(), Message::SYSTEM_ID);
     m_socket->sendMsg(msg);
+}
+
+void MainWindow::initUI()
+{
+    // 隐藏菜单栏 状态栏
+    ui->menubar->hide();
+    ui->statusbar->hide();
+    // 设置窗口高度
+    setFixedHeight(ui->userWidget->height());
+    setFixedWidth(width());
+    // ui->chatWidget->setEnabled(false);
 }
 
 void MainWindow::textMessageSlot(int id, QString text)
 {
+    // 遍历好友id
+    for (int row = 0; row < ui->friendsListView->model()->rowCount(); ++row)
+    {
+        QModelIndex index = ui->friendsListView->model()->index(row, 0);
+        auto friendUser = index.data(Qt::UserRole).value<std::shared_ptr<User>>();
+        if (friendUser->id() == id)
+        {
+            // 先尝试取出chatWidget
+            ChatWidget *chatWidget = index.data(Qt::UserRole + 1).value<ChatWidget *>();
+            if (chatWidget == nullptr)
+            {
+                chatWidget = new ChatWidget(m_user, friendUser, this);
+                ui->chatStackedWidget->addWidget(chatWidget);
+                ui->friendsListView->model()->setData(index, QVariant::fromValue(chatWidget), Qt::UserRole + 1);
+            }
+            else
+            {
+                ui->chatStackedWidget->setCurrentWidget(chatWidget);
+            }
+            // chatWidget
+        }
+    }
+
+    // 存入消息
+
     // 判断是否是当前聊天窗口
-    if(id == ui->userListTableWidget->currentItem()->data(Qt::UserRole).toInt())
+    /*if(id == ui->userListTableWidget->currentItem()->data(Qt::UserRole).toInt())
     {
         ui->chatTextBrowser->append(QString("<p style='color:green'>%1: %2</p>").arg(ui->friendNameLabel->text()).arg(text));
     }
@@ -106,13 +138,13 @@ void MainWindow::textMessageSlot(int id, QString text)
     {
         m_messages.insert(id, text);
         setReddot(id);
-    }
-
+    }*/
 }
 
 void MainWindow::updateFriendList(QVector<User> friends)
 {
-    m_friends = friends;
+    ui->friendsListView->setFriends(friends);
+    /*m_friends = friends;
     // 更新userListTableWidget
     //  ui->userListTableWidget->clear();
     ui->userListTableWidget->setRowCount(m_friends.size());
@@ -139,7 +171,8 @@ void MainWindow::updateFriendList(QVector<User> friends)
         // 双击item qdebug输出data(Qt::UserRole)
         connect(ui->userListTableWidget, &QTableWidget::itemDoubleClicked, this, &MainWindow::itemDoubleClickedSlot);
         row++;
-    }
+    }*/
+
     // 更新视图
     //  ui->userListTableWidget->update();
 }
@@ -150,35 +183,58 @@ void MainWindow::itemDoubleClickedSlot(QTableWidgetItem *item)
     // 获取消息
     QList<QString> messagesForId = m_messages.values(uid);
 
-    ui->userListTableWidget->setCurrentItem(item); // 关键关联
+    // ui->userListTableWidget->setCurrentItem(item); // 关键关联
     qDebug() << "选中用户id:" << uid;
     // 传用户名给聊天窗口
-    ui->friendNameLabel->setText(item->text());
-    ui->chatWidget->setEnabled(true);
+    // ui->friendNameLabel->setText(item->text());
+    // ui->chatWidget->setEnabled(true);
     // 显示消息
     if (messagesForId.isEmpty())
     {
-        ui->chatTextBrowser->clear();
+        // ui->chatTextBrowser->clear();
     }
     else
     {
-        ui->chatTextBrowser->clear();
+        // ui->chatTextBrowser->clear();
         for (QString message : messagesForId)
         {
-            //好友消息
-            ui->chatTextBrowser->append(QString("<p style='color:green'>%1: %2</p>").arg(ui->friendNameLabel->text()).arg(message));
+            // 好友消息
+            // ui->chatTextBrowser->append(QString("<p style='color:green'>%1: %2</p>").arg(ui->friendNameLabel->text()).arg(message));
         }
+    }
+}
+
+void MainWindow::onItemDoubleClicked(const QModelIndex &index)
+{
+    auto friendUser = index.data(Qt::UserRole).value<std::shared_ptr<User>>();
+    // 先尝试取出chatWidget
+    ChatWidget *chatWidget = index.data(Qt::UserRole + 1).value<ChatWidget *>();
+    if (chatWidget == nullptr)
+    {
+        // qDebug() << "用户:" << user.username() << "还没有chatWidget";
+        // 新建窗口
+        chatWidget = new ChatWidget(m_user, friendUser, this);
+        ui->chatStackedWidget->addWidget(chatWidget);
+        ui->chatStackedWidget->setCurrentWidget(chatWidget);
+        ui->friendsListView->model()->setData(index, QVariant::fromValue(chatWidget), Qt::UserRole + 1);
+    }
+    else
+    {
+        // qDebug() << "用户:" << user.username() << "已经存在chatWidget";
+        ui->chatStackedWidget->setCurrentWidget(chatWidget);
     }
 }
 
 void MainWindow::sendPushButtonSlot()
 {
-    QString content = ui->chatTextEdit->toPlainText();
+    QString content;
+    // QString content = ui->chatTextEdit->toPlainText();
     if (content.isEmpty())
     {
         return;
     }
-    if (ui->friendNameLabel->text().isEmpty())
+    if (false)
+    // if (ui->friendNameLabel->text().isEmpty())
     {
         return;
     }
@@ -186,13 +242,14 @@ void MainWindow::sendPushButtonSlot()
     {
         // 发送消息
         // 获取当前选中的用户
-        QTableWidgetItem *item = ui->userListTableWidget->currentItem();
+        /*QTableWidgetItem *item = ui->userListTableWidget->currentItem();
         int uid = item->data(Qt::UserRole).toInt();
         TextMessage *msg = new TextMessage(m_user.id(), uid, content);
         m_socket->sendMsg(msg);
         ui->chatTextEdit->clear();
         // 添加到聊天记录
         ui->chatTextBrowser->append(QString("<p style='color:blue'>%1: %2</p>").arg(m_user.username()).arg(content));
+    */
     }
 }
 
@@ -210,4 +267,8 @@ void MainWindow::setReddot(int id)
     //         item->setText(item->text() + "*");
     //     }
     // }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
 }

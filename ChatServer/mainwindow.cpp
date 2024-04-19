@@ -99,3 +99,34 @@ void MainWindow::initThreadPool()
     m_threadPool->setMaxThreadCount(3);
 }
 
+void MainWindow::on_pushButton_clicked()
+{
+    //文件对话框选择图片格式为jpg
+    QString pictureName = QFileDialog::getOpenFileName(this, "选择图片", "", "Image Files(*.jpg)");
+    if (pictureName.isEmpty())
+    {
+        return;
+    }
+    QImage image(pictureName);
+    QByteArray picData;
+    QBuffer buffer(&picData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "JPG");
+    qDebug() << picData;
+    //头像写入数据库
+    QSqlQuery query;
+    QVariant picDataVar(picData);
+    QString sql = "UPDATE `user` SET avatar = :picture where id = :id";
+    query.prepare(sql);
+    query.bindValue(":picture", picDataVar);
+    query.bindValue(":id", 2);
+    if (query.exec())
+    {
+        qDebug() << "头像写入数据库成功";
+    }
+    else
+    {
+        qDebug() << "头像写入数据库失败";
+    }
+}
+
