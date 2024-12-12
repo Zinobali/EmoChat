@@ -1,2 +1,15 @@
+# 忽略VS生成的临时文件和用户设置
+.vs/
+.vscode/
+
 # 忽略Debug文件夹
 build-ChatClient-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/
+
+# 忽略编译输出
+x64/
+
+# 忽略Visual Studio项目文件中的用户特定设置
+*.vcxproj.user
+
+# 忽略Qt Creator的用户特定设置文件
+*.pro.user

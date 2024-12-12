@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>814</width>
-    <height>587</height>
+    <width>300</width>
+    <height>500</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>300</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>300</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -26,6 +38,22 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="tip_label">
+        <property name="text">
+         <string>错误提示</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -51,7 +79,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_2"/>
+      <widget class="QLineEdit" name="email_edit"/>
      </item>
     </layout>
    </item>
@@ -65,7 +93,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_3"/>
+      <widget class="QLineEdit" name="lineEdit_Passwd">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -79,7 +111,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_4"/>
+      <widget class="QLineEdit" name="lineEdit_Confirm">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -96,9 +132,9 @@
       <widget class="QLineEdit" name="lineEdit_5"/>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="get_code">
        <property name="text">
-        <string>获取</string>
+        <string>获取验证码</string>
        </property>
       </widget>
      </item>

@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,15 +12,20 @@ RC_ICONS = app.ico
 DESTDIR = ./bin
 
 SOURCES += \
+    global.cpp \
+    httpmgr.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
     registerdialog.cpp
 
 HEADERS += \
+    global.h \
+    httpmgr.h \
     logindialog.h \
     mainwindow.h \
-    registerdialog.h
+    registerdialog.h \
+    singleton.h
 
 FORMS += \
     logindialog.ui \
@@ -34,3 +39,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     rc.qrc
+
+CONFIG(release, debug | release)
+{
+    TargetConfig = $${PWD}/config.ini
+    #将输入目录中的"/"替换为"\"
+    TargetConfig = $$replace(TargetConfig, /, \\)
+    #将输出目录中的"/"替换为"\"
+    OutputDir =  $${OUT_PWD}/$${DESTDIR}
+    OutputDir = $$replace(OutputDir, /, \\)
+    //执行copy命令
+    QMAKE_POST_LINK += copy /Y \"$$TargetConfig\" \"$$OutputDir\"
+}
