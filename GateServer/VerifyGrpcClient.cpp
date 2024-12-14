@@ -1,7 +1,6 @@
 #include "VerifyGrpcClient.h"
 #include "global.h"
 
-//GetVerifyRsp VerifyGrpcClient::GetVerifyCode(const std::string& email) {
 GetVerifyRsp VerifyGrpcClient::GetVerifyCode(std::string email) {
     ClientContext ctx;
     GetVerifyReq request;
@@ -11,6 +10,7 @@ GetVerifyRsp VerifyGrpcClient::GetVerifyCode(std::string email) {
     Status status = stub_->GetVerifyCode(&ctx, request, &response);
 
     if (!status.ok()) {
+        std::cout << "Verify server is not connected." << std::endl;
         response.set_error(static_cast<int>(ErrorCodes::RPCFailed));
         return response;
     }

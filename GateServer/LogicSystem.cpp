@@ -4,6 +4,7 @@
 #include <json/value.h>
 #include <json/reader.h>
 #include "global.h"
+#include "VerifyGrpcClient.h"
 
 LogicSystem::~LogicSystem() {
     std::cout << "LogicSystem::~LogicSystem()" << std::endl;
@@ -65,6 +66,7 @@ LogicSystem::LogicSystem() {
 
         // success
         auto email = src_root["email"].asString();
+        GetVerifyRsp rsp = VerifyGrpcClient::GetInstance()->GetVerifyCode(email);
         std::cout << "email is " << email << std::endl;
         root["error"] = static_cast<int>(ErrorCodes::Success);
         root["email"] = src_root["email"];

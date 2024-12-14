@@ -1,6 +1,7 @@
 # 忽略VS生成的临时文件和用户设置
 .vs/
 .vscode/
+VerifyServer/config.json
 
 # 忽略Debug文件夹
 build-ChatClient-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/
@@ -13,3 +14,6 @@ x64/
 
 # 忽略Qt Creator的用户特定设置文件
 *.pro.user
+
+# 忽略 node_modules 目录
+node_modules/
