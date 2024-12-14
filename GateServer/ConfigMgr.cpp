@@ -21,6 +21,11 @@ ConfigMgr::SectionProxy ConfigMgr::operator[](const std::string& section_name) {
     return SectionProxy(config_, section_name);
 }
 
+ConfigMgr& ConfigMgr::GetInstance() {
+    static ConfigMgr instance;
+    return instance;
+}
+
 ConfigMgr::SectionProxy::SectionProxy(ptree& section, const std::string& section_name)
     : section_(section), section_name_(section_name) {}
 

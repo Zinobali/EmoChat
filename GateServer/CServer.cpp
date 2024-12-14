@@ -1,9 +1,9 @@
 #include "CServer.h"
+#include "AsioIOServicePool.h"
 
 CServer::CServer(net::io_context& ioc, const USHORT& port)
     :ioContext_(ioc),
-    acceptor_(ioc, tcp::endpoint(tcp::v4(), port)),
-    socket_(ioc) {}
+    acceptor_(ioc, tcp::endpoint(tcp::v4(), port)) {}
 
 CServer::~CServer() {
     std::cout << "~CServer()" << std::endl;
@@ -11,18 +11,21 @@ CServer::~CServer() {
 
 void CServer::Start() {
     auto self(shared_from_this());
-    acceptor_.async_accept(socket_, [self](const boost::system::error_code& error) {
+    auto& io_context = AsioIOServicePool::GetInstance()->GetIOService();
+    auto new_con = std::make_shared<HttpConnection>(io_context);
+    acceptor_.async_accept(new_con->GetSocket(), [self, new_con](const boost::system::error_code& error) {
         try {
             if (error) {
                 self->Start();
                 return;
             }
-            // 未出现错误，则创建一个连接
-            std::make_shared<HttpConnection>(std::move(self->socket_))->Start();
-            self->Start();
+
+            new_con->Start();
+            self->Start(); // 继续接收连接
         }
         catch (std::exception& e) {
             std::cout << "exception in CServer::Start(): " << e.what() << std::endl;
+            self->Start();
         }
         });
 }

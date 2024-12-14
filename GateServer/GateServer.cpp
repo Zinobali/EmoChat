@@ -6,8 +6,8 @@
 
 int main() {
     try {
-        ConfigMgr g_configMgr;
-        std::string gate_port_str = g_configMgr["GateServer"]["Port"];
+        auto& configMgr = ConfigMgr::GetInstance();
+        std::string gate_port_str = configMgr["GateServer"]["Port"];
         USHORT port = atoi(gate_port_str.c_str());
         net::io_context io_context;
         net::signal_set signals(io_context, SIGINT, SIGTERM);

@@ -3,8 +3,8 @@
 
 
 
-HttpConnection::HttpConnection(tcp::socket socket)
-    : socket_(std::move(socket)),
+HttpConnection::HttpConnection(net::io_context& io_context)
+    : socket_(io_context),
     buffer_{ 8192 },
     timeout_(socket_.get_executor(), std::chrono::seconds(60)) {}
 
@@ -28,6 +28,12 @@ void HttpConnection::Start() {
             }
         });
 }
+
+tcp::socket& HttpConnection::GetSocket() {
+    return socket_;
+}
+
+
 
 void HttpConnection::HandleRequest() {
     response_.version(request_.version()); // set version

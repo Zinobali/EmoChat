@@ -24,12 +24,13 @@ class ConfigMgr
         std::string section_name_;
     };
 public:
-    ConfigMgr();
-
     void LoadConfig(const std::string& filename);
     SectionProxy operator[](const std::string& section_name);
+    static ConfigMgr& GetInstance();
 
 private:
+    ConfigMgr();
+
     ptree config_;
     std::mutex mutex_;
 };
