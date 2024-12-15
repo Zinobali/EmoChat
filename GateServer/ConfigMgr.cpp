@@ -3,7 +3,6 @@
 ConfigMgr::ConfigMgr() {
     auto current_path = boost::filesystem::current_path();
     auto config_path = current_path / "config.ini";
-    std::cout << "Config path: " << config_path << std::endl;
     LoadConfig(config_path.string());
 }
 

@@ -44,10 +44,7 @@ gRPCPool::~gRPCPool() {
 gRPCPool::StubPtr gRPCPool::getConnection() {
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.wait(lock, [this] {
-        if (b_stop_) {
-            return true;
-        }
-        return !connections_.empty();
+        return b_stop_ || !connections_.empty();
         });
 
     if (b_stop_) {

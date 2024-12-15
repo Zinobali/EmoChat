@@ -3,7 +3,9 @@
 
 CServer::CServer(net::io_context& ioc, const USHORT& port)
     :ioContext_(ioc),
-    acceptor_(ioc, tcp::endpoint(tcp::v4(), port)) {}
+    acceptor_(ioc, tcp::endpoint(tcp::v4(), port)) {
+    std::cout << "GateServer started on port: " << acceptor_.local_endpoint().port() << std::endl;
+}
 
 CServer::~CServer() {
     std::cout << "~CServer()" << std::endl;

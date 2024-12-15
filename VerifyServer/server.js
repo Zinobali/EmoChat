@@ -4,12 +4,34 @@ const message_proto = require('./proto');
 const constModule = require('./const')
 const grpc = require('@grpc/grpc-js')
 const configModule = require('./config')
+const redisModule = require('./redis');
+const { error } = require('console');
 
 async function GetVerifyCode(call, callback) {
     console.log("email is ", call.request.email)
     try {
+        let query_res = await redisModule.GetRedis(constModule.code_prefix + call.request.email)
+        if (query_res == null) {
+            console.log("query_res is null")
+        }
+        console.log("query_res is ", query_res)
 
-        let uniqueId = uuidv4();
+        let uniqueId = query_res;
+        if (query_res == null) {
+            uniqueId = uuidv4();
+            if (uniqueId.length > 6) {
+                uniqueId = uniqueId.substring(0, 6);
+            }
+            let bres = await redisModule.SetRedisExpire(constModule.code_prefix + call.request.email, uniqueId, 600);
+            if (!bres) {
+                callback(null, {
+                    email: call.request.email,
+                    error: constModule.Errors.RedisErr
+                });
+                return;
+            }
+        }
+
         console.log("uniqueId is ", uniqueId);
         let text_str = '您的验证码为 【' + uniqueId + '】 请三分钟内完成注册';
         // 发送邮件
@@ -30,8 +52,8 @@ async function GetVerifyCode(call, callback) {
 
     }
     catch (error) {
-
         console.log("catch error is ", error)
+
         callback(null, {
             email: call.request.email,
             error: constModule.Errors.Exception
