@@ -20,11 +20,14 @@ public:
 private:
     void showTip(QString str,bool ok);
     void initHttpHandlers();
+    void testEditInfo();
 
 private slots:
     void on_get_code_clicked();
     void slot_reg_mod_finish(RequestId id, QString res, ErrorCodes ec);
 
+
+    void on_sure_btn_clicked();
 
 private:
     Ui::RegisterDialog *ui;

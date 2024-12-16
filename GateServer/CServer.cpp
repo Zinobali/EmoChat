@@ -25,7 +25,7 @@ void CServer::Start() {
             new_con->Start();
             self->Start(); // 继续接收连接
         }
-        catch (std::exception& e) {
+        catch (const std::exception& e) {
             std::cout << "exception in CServer::Start(): " << e.what() << std::endl;
             self->Start();
         }

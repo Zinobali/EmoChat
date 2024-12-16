@@ -16,10 +16,13 @@ public:
     ~LogicSystem();
     bool HandleGet(std::string url, std::shared_ptr<HttpConnection> connection);
     bool HandlePost(std::string url, std::shared_ptr<HttpConnection> connection);
-    void RegisterGetHandler(std::string url, HttpHandler handler);
-    void RegisterPostHandler(std::string url, HttpHandler handler);
 
 private:
+    void RegisterGetHandler(std::string url, HttpHandler handler);
+    void RegisterPostHandler(std::string url, HttpHandler handler);
+    void InitGetHandlers();
+    void InitPostHandlers();
+
     LogicSystem();
     std::map<std::string, HttpHandler> get_handlers_;
     std::map<std::string, HttpHandler> post_handlers_;

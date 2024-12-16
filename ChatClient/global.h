@@ -25,4 +25,8 @@ enum class Modules{
     REGISTERMOD = 0,
 };
 
+constexpr int toInt(const ErrorCodes& code) {
+    return static_cast<int>(code);
+}
+
 #endif // GLOBAL_H

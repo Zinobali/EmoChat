@@ -65,7 +65,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="user_edit"/>
      </item>
     </layout>
    </item>
@@ -93,7 +93,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_Passwd">
+      <widget class="QLineEdit" name="pass_edit">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
        </property>
@@ -111,7 +111,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_Confirm">
+      <widget class="QLineEdit" name="confirm_edit">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
        </property>
@@ -129,7 +129,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_5"/>
+      <widget class="QLineEdit" name="varify_edit"/>
      </item>
      <item>
       <widget class="QPushButton" name="get_code">
@@ -156,14 +156,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="sure_btn">
        <property name="text">
         <string>确定</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="cancle_btn">
        <property name="text">
         <string>取消</string>
        </property>
