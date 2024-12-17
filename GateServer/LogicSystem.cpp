@@ -6,6 +6,7 @@
 #include "global.h"
 #include "VerifyGrpcClient.h"
 #include "RedisMgr.h"
+#include "MySQLMgr.h"
 
 LogicSystem::~LogicSystem() {
     std::cout << "LogicSystem::~LogicSystem()" << std::endl;
@@ -91,6 +92,20 @@ void LogicSystem::InitPostHandlers() {
             beast::ostream(connection->response_.body()) << root.toStyledString(); // send error code
             return true;
         }
+
+        auto name = src_root["user"].asString();
+        auto pwd = src_root["passwd"].asString();
+        auto confirm = src_root["confirm"].asString();
+        auto email = src_root["email"].asString();
+
+        if (pwd != confirm) {
+            std::cout << "password err " << std::endl;
+            root["error"] = toInt(ErrorCodes::PasswdErr);
+            std::string jsonstr = root.toStyledString();
+            beast::ostream(connection->response_.body()) << jsonstr;
+            return true;
+        }
+
         // 从redis获取验证码
         std::string verify_code;
         bool b_get_verify = RedisMgr::GetInstance().Get(CODEPREFIX + src_root["email"].asString(), verify_code);
@@ -108,20 +123,30 @@ void LogicSystem::InitPostHandlers() {
             return true;
         }
         // 用户是否已存在(好像没用)
-        bool b_usr_exist = RedisMgr::GetInstance().ExistsKey(src_root["user"].asString());
+        /*bool b_usr_exist = RedisMgr::GetInstance().ExistsKey(src_root["user"].asString());
         if (b_usr_exist) {
             std::cout << " user exist" << std::endl;
             root["error"] = toInt(ErrorCodes::UserExist);
             beast::ostream(connection->response_.body()) << root.toStyledString();
             return true;
+        }*/
+
+        int uid = MySQLMgr::GetInstance()->RegUser(name, email, pwd);
+        if (uid == 0 || uid == -1) {
+            std::cout << " user or email exist" << std::endl;
+            root["error"] = toInt(ErrorCodes::UserExist);
+            std::string jsonstr = root.toStyledString();
+            beast::ostream(connection->response_.body()) << jsonstr;
+            return true;
         }
 
         std::cout << " user register success" << std::endl;
         root["error"] = 0;
-        root["email"] = src_root["email"];
-        root["user"] = src_root["user"].asString();
-        root["passwd"] = src_root["passwd"].asString();
-        root["confirm"] = src_root["confirm"].asString();
+        root["uid"] = uid;
+        root["email"] = email;
+        root["user"] = name;
+        root["passwd"] = pwd;
+        root["confirm"] = confirm;
         root["verifycode"] = src_root["verifycode"].asString();
         beast::ostream(connection->response_.body()) << root.toStyledString();
         return true;

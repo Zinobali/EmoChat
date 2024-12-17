@@ -4,6 +4,7 @@
 #include <iostream>
 #include <boost/beast.hpp>
 #include <boost/beast/http.hpp>
+#include <unordered_map>
 
 namespace net = boost::asio;
 using tcp = net::ip::tcp;
