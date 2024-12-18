@@ -9,8 +9,7 @@ MySQLConnectionPool::MySQLConnectionPool(const std::string& host, const unsigned
         SessionOption::PWD, pwd
     ) {
     for (size_t i = 0; i < pool_size_; i++) {
-        auto conn = std::make_unique<mysqlx::Session>(settings_);
-        pool_.push(std::move(conn));
+        pool_.push(mysqlx::Session(settings_));
     }
 }
 
@@ -18,31 +17,20 @@ MySQLConnectionPool::~MySQLConnectionPool() {
     Close();
 }
 
-std::unique_ptr<mysqlx::Session> MySQLConnectionPool::getConnection() {
-    std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait(lock, [this]() {
-        return b_stop_ || !pool_.empty(); // 如果池为空，等待直到有连接释放
-        });
-    if (b_stop_) {
-        return nullptr;
-    }
-    auto conn = std::move(pool_.front());
-    pool_.pop();
+std::shared_ptr<mysqlx::Session> MySQLConnectionPool::getConnection() {
+    if (b_stop_) return nullptr;
+    auto conn = pool_.pop();
+    if (!conn) return nullptr;
     return conn;
 }
 
-void MySQLConnectionPool::releaseConnection(std::unique_ptr<mysqlx::Session>& conn) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (b_stop_) {
-        return; // 如果池已停止，则不返回连接
-    }
-    pool_.push(std::move(conn));
-    cv_.notify_all();
+void MySQLConnectionPool::releaseConnection(std::shared_ptr<mysqlx::Session>& conn) {
+    if (b_stop_) return; // 如果池已停止，则不返回连接
+    pool_.push(conn);
 }
 
 void MySQLConnectionPool::Close() {
     b_stop_ = true;
-    cv_.notify_all();
 }
 
 mysqlx::Session MySQLConnectionPool::createConnection() {
