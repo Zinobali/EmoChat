@@ -19,8 +19,18 @@ public:
 
 private:
     void showTip(QString str,bool ok);
+    void initUiDesign();
     void initHttpHandlers();
-    void testEditInfo();
+    void initUiSignals();
+    bool checkUserValid();
+    bool checkPassValid();
+    bool checkConfirmValid();
+    bool checkEmailValid();
+    bool checkVerifyValid();
+    bool validateFields();
+    void testEditInfo(); // 测试函数，后续删除
+    void AddTipErr(const TipErr& tc,const QString& tips);
+    void DelTipErr(const TipErr& tc);
 
 private slots:
     void on_get_code_clicked();
@@ -32,6 +42,7 @@ private slots:
 private:
     Ui::RegisterDialog *ui;
     QMap<RequestId, std::function<void(const QJsonObject&)>> _handlers;
+    QMap<TipErr,QString> _tip_errs;
 };
 
 #endif // REGISTERDIALOG_H

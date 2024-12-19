@@ -99,6 +99,28 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="ClickedLabel" name="pass_visible">
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -117,6 +139,28 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="ClickedLabel" name="confirm_visible">
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -129,10 +173,10 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="varify_edit"/>
+      <widget class="QLineEdit" name="verify_edit"/>
      </item>
      <item>
-      <widget class="QPushButton" name="get_code">
+      <widget class="TimerBtn" name="get_code">
        <property name="text">
         <string>获取验证码</string>
        </property>
@@ -186,6 +230,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TimerBtn</class>
+   <extends>QPushButton</extends>
+   <header location="global">timerbtn.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ClickedLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">clickedlabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -2,9 +2,36 @@ QDialog#LoginDialog{
     background-color:rgb(255,255,255)
 }
 
+/* 注册界面的提示框 */
 #tip_label[state='normal']{
    color: green;
 }
 #tip_label[state='error']{
    color: red;
+}
+
+/* 图标来控制密码的显示和隐藏 */
+#pass_visible[state='unvisible']{
+   border-image: url(:/images/unvisible.png);
+}
+#pass_visible[state='unvisible_hover']{
+   border-image: url(:/images/unvisible_hover.png);
+}
+#pass_visible[state='visible']{
+   border-image: url(:/images/visible.png);
+}
+#pass_visible[state='visible_hover']{
+   border-image: url(:/images/visible_hover.png);
+}
+#confirm_visible[state='unvisible']{
+   border-image: url(:/images/unvisible.png);
+}
+#confirm_visible[state='unvisible_hover']{
+   border-image: url(:/images/unvisible_hover.png);
+}
+#confirm_visible[state='visible']{
+   border-image: url(:/images/visible.png);
+}
+#confirm_visible[state='visible_hover']{
+   border-image: url(:/images/visible_hover.png);
 }

@@ -12,20 +12,24 @@ RC_ICONS = app.ico
 DESTDIR = ./bin
 
 SOURCES += \
+    clickedlabel.cpp \
     global.cpp \
     httpmgr.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    registerdialog.cpp
+    registerdialog.cpp \
+    timerbtn.cpp
 
 HEADERS += \
+    clickedlabel.h \
     global.h \
     httpmgr.h \
     logindialog.h \
     mainwindow.h \
     registerdialog.h \
-    singleton.h
+    singleton.h \
+    timerbtn.h
 
 FORMS += \
     logindialog.ui \
