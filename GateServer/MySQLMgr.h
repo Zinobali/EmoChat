@@ -34,8 +34,13 @@ public:
     int RegisterUser(const std::string& name, const std::string& email, const std::string& pwd);
 
 private:
+    std::string GenerateSalt(); // 生成盐
+    std::string HashPassword(const std::string& pwd, const std::string& salt); // 哈希密码
+    bool VerifyPassword(const std::string& pwd, const std::string& salt, const std::string& hash); // 验证密码
+
     std::unique_ptr<MySQLConnectionPool> pool_;
     std::string schema_;
+
 };
 
 class MySQLMgr : public Singleton<MySQLMgr>
@@ -46,6 +51,7 @@ public:
 
 private:
     MySQLMgr() = default;
+
     MySQLDao dao_;
 };
 
