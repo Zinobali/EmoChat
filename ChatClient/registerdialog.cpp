@@ -5,7 +5,8 @@
 #include "httpmgr.h"
 
 RegisterDialog::RegisterDialog(QWidget *parent)
-    : QDialog(parent), ui(new Ui::RegisterDialog)
+    : QDialog(parent), ui(new Ui::RegisterDialog),
+    _countdown_timer(new QTimer(this))
 {
     initUiDesign();
     initHttpHandlers();
@@ -39,40 +40,42 @@ void RegisterDialog::initUiDesign()
     ui->tip_label->setProperty("state", "normal");
     ui->tip_label->clear();
     repolish(ui->tip_label);
-    ui->pass_visible->SetState("unvisible", "unvisible_hover", "unvisible_hover",
-                               "visible", "visible_hover", "visible_hover");
-    ui->confirm_visible->SetState("unvisible", "unvisible_hover", "unvisible_hover",
-                                  "visible", "visible_hover", "visible_hover");
+    ui->pass_visible->SetState("unvisible", "unvisible_hover", "",
+                               "visible", "visible_hover", "");
+    ui->confirm_visible->SetState("unvisible", "unvisible_hover", "",
+                                  "visible", "visible_hover", "");
 }
 
 void RegisterDialog::initHttpHandlers()
 {
     // 注册验证码回包逻辑
-    _handlers.insert(RequestId::ID_GET_VERIFY_CODE, [this](const QJsonObject &jsonObj)
-                     {
-                         auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
+    _handlers.insert(RequestId::ID_GET_VERIFY_CODE, [this](const QJsonObject &jsonObj) {
+        auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
 
-                         if (error != ErrorCodes::SUCCESS) {
-                             showTip(tr("参数错误"),false);
-                             return;
-                         }
+        if (error != ErrorCodes::SUCCESS) {
+            showTip(tr("参数错误"),false);
+            return;
+        }
 
-                         QString email = jsonObj["email"].toString();
-                         showTip(tr("验证码已发送到邮箱，注意查收"), true);
-                         qDebug()<< "email is" << email ; });
+        QString email = jsonObj["email"].toString();
+        showTip(tr("验证码已发送到邮箱，注意查收"), true);
+        qDebug()<< "email is" << email ;
+    });
     // 注册注册用户回包逻辑
-    _handlers.insert(RequestId::ID_REG_USER, [this](const QJsonObject &jsonObj)
-                     {
-                         auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
-                         if(error!= ErrorCodes::SUCCESS){
-                             showTip(tr("参数错误"),false);
-                             return;
-                         }
-                         auto email = jsonObj["email"].toString();
-                         auto user = jsonObj["user"].toString();
-                         showTip(tr("用户注册成功"), true);
-                         qDebug() << "email is" << email ;
-                         qDebug() << "user is" << user; });
+    _handlers.insert(RequestId::ID_REG_USER, [this](const QJsonObject &jsonObj) {
+        auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
+        if(error!= ErrorCodes::SUCCESS){
+            showTip(tr("参数错误"),false);
+            return;
+        }
+        auto email = jsonObj["email"].toString();
+        auto user = jsonObj["user"].toString();
+        showTip(tr("用户注册成功"), true);
+        qDebug() << "email is" << email ;
+        qDebug() << "user is" << user;
+        ChangeTipPage();
+    });
+
 }
 
 void RegisterDialog::initUiSignals()
@@ -106,6 +109,16 @@ void RegisterDialog::initUiSignals()
             return;
         }
         ui->confirm_edit->setEchoMode(QLineEdit::Normal);
+    });
+    connect(_countdown_timer, &QTimer::timeout, this, [this](){
+        if (_countdown <= 0) {
+            _countdown_timer->stop();
+            emit sigSwitchLogin(this);
+            return;
+        }
+        _countdown--;
+        auto tip_str = QString("注册成功，%1 s后返回登录").arg(_countdown);
+        ui->reg_ok_lb->setText(tip_str);
     });
 }
 
@@ -141,7 +154,6 @@ bool RegisterDialog::checkPassValid()
         // 提示字符非法
         AddTipErr(TipErr::TIP_PWD_ERR, tr("不能包含非法字符"));
         return false;
-        ;
     }
     DelTipErr(TipErr::TIP_PWD_ERR);
     return true;
@@ -239,23 +251,26 @@ void RegisterDialog::DelTipErr(const TipErr &tc)
     showTip(_tip_errs.first(), false);
 }
 
+void RegisterDialog::ChangeTipPage()
+{
+    _countdown_timer->stop();
+    _countdown = 5;
+    ui->stackedWidget->setCurrentWidget(ui->tip_page);
+    // 启动定时器，设置间隔为1000毫秒（1秒）
+    _countdown_timer->start(1000);
+}
+
 void RegisterDialog::on_get_code_clicked()
 {
-    auto email = ui->email_edit->text();
-    // 邮箱地址的正则表达式
-    QRegularExpression regex(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
-    if (regex.match(email).hasMatch())
-    {
-        // todo...发送http请求获取验证码
-        QJsonObject json_obj;
-        json_obj["email"] = email;
-        HttpMgr::GetInstance()->PostHttpReq(QUrl(gate_url_prefix + "/get_verifycode"),
-                                            json_obj, RequestId::ID_GET_VERIFY_CODE, Modules::REGISTERMOD);
-    }
-    else
-    {
+    if (!checkEmailValid()) {
         showTip(tr("邮箱地址不正确"), false);
+        return;
     }
+
+    QJsonObject json_obj;
+    json_obj["email"] = ui->email_edit->text();
+    HttpMgr::GetInstance()->PostHttpReq(QUrl(gate_url_prefix + "/get_verifycode"),
+                                        json_obj, RequestId::ID_GET_VERIFY_CODE, Modules::REGISTERMOD);
 }
 
 void RegisterDialog::slot_reg_mod_finish(RequestId id, QString res, ErrorCodes ec)
@@ -309,3 +324,17 @@ void RegisterDialog::on_sure_btn_clicked()
     HttpMgr::GetInstance()->PostHttpReq(QUrl(gate_url_prefix + "/user_register"),
                                         json_obj, RequestId::ID_REG_USER, Modules::REGISTERMOD);
 }
+
+void RegisterDialog::on_return_btn_clicked()
+{
+    _countdown_timer->stop();
+    emit sigSwitchLogin(this);
+}
+
+
+void RegisterDialog::on_cancle_btn_clicked()
+{
+    _countdown_timer->stop();
+    emit sigSwitchLogin(this);
+}
+

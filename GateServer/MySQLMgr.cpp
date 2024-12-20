@@ -4,6 +4,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/functional/hash.hpp>
+#include "global.h"
 
 MySQLConnectionPool::MySQLConnectionPool(const std::string& host, const unsigned int port, const std::string& user, const std::string& pwd, size_t pool_size)
     :pool_size_(pool_size), b_stop_(false),
@@ -59,10 +60,12 @@ MySQLDao::MySQLDao() {
 
 int MySQLDao::RegisterUser(const std::string& name, const std::string& email, const std::string& pwd) {
     auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return 0;
+    }
+    Defer defer([&]() { pool_->releaseConnection(conn); });
     try {
-        if (!conn) {
-            return 0;
-        }
         // 生成盐值
         auto salt = GenerateSalt();
         std::cout << "生成的盐值为: " << salt << std::endl;
@@ -76,16 +79,13 @@ int MySQLDao::RegisterUser(const std::string& name, const std::string& email, co
         // 获取存储过程返回值
         auto out_result = conn->sql("SELECT @result").execute().fetchOne();
         if (!out_result) {
-            pool_->releaseConnection(conn);
             return -1;
         }
         int result_value = out_result[0];
         std::cout << "Result: " << result_value << std::endl;
-        pool_->releaseConnection(conn);
         return result_value;
     }
     catch (const mysqlx::Error& err) {
-        pool_->releaseConnection(conn);
         std::cerr << "Error executing query: " << err.what() << std::endl;
         return -1;
     }
@@ -93,6 +93,22 @@ int MySQLDao::RegisterUser(const std::string& name, const std::string& email, co
 
 int MySQLMgr::RegUser(const std::string& name, const std::string& email, const std::string& pwd) {
     return dao_.RegisterUser(name, email, pwd);
+}
+
+bool MySQLMgr::CheckEmail(const std::string& name, const std::string& email) {
+    return dao_.CheckEmail(name, email);
+}
+
+bool MySQLMgr::UpdatePwd(const std::string& email, const std::string& pwd) {
+    return dao_.UpdatePwd(email, pwd);
+}
+
+bool MySQLMgr::EmailExist(const std::string& email) {
+    return dao_.EmailExist(email);
+}
+
+bool MySQLMgr::NameExist(const std::string& name) {
+    return dao_.NameExist(name);
 }
 
 std::string MySQLDao::GenerateSalt() {
@@ -109,4 +125,54 @@ std::string MySQLDao::HashPassword(const std::string& pwd, const std::string& sa
 
 bool MySQLDao::VerifyPassword(const std::string& pwd, const std::string& salt, const std::string& hash) {
     return HashPassword(pwd, salt) == hash;
+}
+
+bool MySQLDao::CheckEmail(const std::string& name, const std::string& email) {
+    //todo
+    return false;
+}
+
+bool MySQLDao::UpdatePwd(const std::string& email, const std::string& pwd) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&]() { pool_->releaseConnection(conn); });
+    try {
+        // 生成盐值和哈希密码
+        auto salt = GenerateSalt();
+        auto h_pwd = HashPassword(pwd, salt);
+
+        auto users = conn->getSchema(schema_).getTable("user");
+        auto res = users.update().set("hashed_password", h_pwd).set("salt", salt).where("email = :param1").bind("param1", email).execute();
+        return res.getAffectedItemsCount() > 0;
+    }
+    catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query: " << err.what() << std::endl;
+        return false;
+    }
+}
+
+bool MySQLDao::EmailExist(const std::string& email) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&]() { pool_->releaseConnection(conn); });
+    try {
+        auto users = conn->getSchema(schema_).getTable("user");
+        auto res = users.select("email").where("email = :param1").bind("param1", email).execute().fetchOne();
+        return !res.isNull();
+    }
+    catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query: " << err.what() << std::endl;
+        return false;
+    }
+}
+
+bool MySQLDao::NameExist(const std::string& name) {
+    //todo
+    return false;
 }

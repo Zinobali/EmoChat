@@ -1,6 +1,19 @@
 #pragma once
+#include <functional>
 
 constexpr char CODEPREFIX[] = "code_";
+
+class Defer {
+public:
+    explicit Defer(std::function<void()>&& func) :func_(std::move(func)) {}
+    ~Defer() { func_(); }
+    Defer(const Defer&) = delete;
+    Defer& operator=(const Defer&) = delete;
+    Defer(Defer&& other) = default;
+
+private:
+    std::function<void()> func_;
+};
 
 enum class ErrorCodes {
     Success = 0,

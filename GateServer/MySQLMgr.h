@@ -32,6 +32,10 @@ public:
     MySQLDao();
 
     int RegisterUser(const std::string& name, const std::string& email, const std::string& pwd);
+    bool CheckEmail(const std::string& name, const std::string& email);
+    bool UpdatePwd(const std::string& email, const std::string& pwd);
+    bool EmailExist(const std::string& email);
+    bool NameExist(const std::string& name);
 
 private:
     std::string GenerateSalt(); // Éú³ÉÑÎ
@@ -48,6 +52,11 @@ class MySQLMgr : public Singleton<MySQLMgr>
     friend class Singleton<MySQLMgr>;
 public:
     int RegUser(const std::string& name, const std::string& email, const std::string& pwd);
+    bool CheckEmail(const std::string& name, const std::string& email);
+    bool UpdatePwd(const std::string& email, const std::string& pwd);
+    bool EmailExist(const std::string& email);
+    bool NameExist(const std::string& name);
+    bool CheckPwd(const std::string& email, const std::string& pwd);
 
 private:
     MySQLMgr() = default;
