@@ -45,9 +45,9 @@ void LoginDialog::initHttpHandlers()
             return;
         }
 
-        QString user = jsonObj["user"].toString();
         showTip(tr("登录成功"), true);
-        qDebug()<< "user is" << user ;
+        qDebug()<< "user is" << jsonObj["user"].toString();
+        qDebug()<< "token is" << jsonObj["token"].toString();
     });
 }
 

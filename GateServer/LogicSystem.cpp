@@ -7,6 +7,7 @@
 #include "VerifyGrpcClient.h"
 #include "RedisMgr.h"
 #include "MySQLMgr.h"
+#include "StatusGrpcClient.h"
 
 LogicSystem::~LogicSystem() {
     std::cout << "LogicSystem::~LogicSystem()" << std::endl;
@@ -206,6 +207,53 @@ void LogicSystem::InitPostHandlers() {
         root["email"] = email;
         root["passwd"] = pwd;
         root["verifycode"] = verify_code;
+        beast::ostream(connection->response_.body()) << root.toStyledString();
+        return true;
+        });
+
+    RegisterPostHandler("/user_login", [](std::shared_ptr<HttpConnection> connection) {
+        auto body_str = beast::buffers_to_string(connection->request_.body().data());
+        std::cout << "receive body is " << body_str << std::endl;
+        connection->response_.set(http::field::content_type, "text/json");
+        Json::Value root, src_root;
+        Json::Reader reader;
+        auto parse_success = reader.parse(body_str, src_root);
+        if (!parse_success) {
+            std::cout << "Failed to parse JSON data!" << std::endl;
+            root["error"] = toInt(ErrorCodes::Error_Json);
+            beast::ostream(connection->response_.body()) << root.toStyledString(); // send error code
+            return true;
+        }
+
+        auto email = src_root["email"].asString();
+        auto pwd = src_root["passwd"].asString();
+        UserInfo out_user;
+        bool pwd_valid = MySQLMgr::GetInstance()->CheckPwd(email, pwd, out_user);
+        if (!pwd_valid) {
+            std::cout << "User pwd not match!" << std::endl;
+            root["error"] = toInt(ErrorCodes::PasswdInvalid);
+            beast::ostream(connection->response_.body()) << root.toStyledString();
+            return true;
+        }
+
+        // 从StatusServer获得连接
+        auto reply = StatusGrpcClient::GetInstance()->GetChatServer(out_user.uid);
+        if (reply.error()) {
+            std::cout << " grpc get chat server failed, error is: " << reply.error() << std::endl;
+            root["error"] = toInt(ErrorCodes::RPCFailed);
+            beast::ostream(connection->response_.body()) << root.toStyledString();
+            return true;
+        }
+
+        std::cout << "succeed to load userinfo uid is: " << out_user.uid << std::endl;
+        std::cout << "succeed to load userinfo name is: " << out_user.name << std::endl;
+        root["error"] = 0;
+        root["user"] = out_user.name;
+        root["uid"] = out_user.uid;
+        root["email"] = out_user.email;
+        root["host"] = reply.host();
+        root["port"] = reply.port();
+        root["token"] = reply.token();
         beast::ostream(connection->response_.body()) << root.toStyledString();
         return true;
         });
