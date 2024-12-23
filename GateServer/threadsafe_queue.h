@@ -124,13 +124,14 @@ public:
 
     void push(std::shared_ptr<T> new_value) {
         std::unique_ptr<node> p(new node);
-        node* const new_tail = p.get(); {
+        node* const new_tail = p.get();
+        {
             std::lock_guard<std::mutex> tail_lock(tail_mtx_);
             tail_->data = std::move(new_value);
             tail_->next = std::move(p);
             tail_ = new_tail;
-            cv_.notify_one();
         }
+        cv_.notify_one();
     }
 
     void push(T new_value) {

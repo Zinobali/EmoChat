@@ -4,6 +4,7 @@
 #include <QRegularExpression>
 #include "global.h"
 
+
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::LoginDialog)
@@ -33,6 +34,10 @@ void LoginDialog::initUiSignals()
     });
     //连接登录回包信号
     connect(HttpMgr::GetInstance().get(), &HttpMgr::sig_login_mod_finish, this, &LoginDialog::slot_login_mod_finish);
+    //连接tcp连接请求的信号和槽函数
+    connect(this, &LoginDialog::sig_connect_tcp, TcpMgr::GetInstance().get(), &TcpMgr::slot_tcp_connect);
+    //TcpMgr连接成功信号
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_con_success, this, &LoginDialog::slot_tcp_con_finish);
 }
 
 void LoginDialog::initHttpHandlers()
@@ -42,12 +47,21 @@ void LoginDialog::initHttpHandlers()
 
         if (error != ErrorCodes::SUCCESS) {
             showTip(tr("参数错误"), false);
+            enableBtn(true);
             return;
         }
 
-        showTip(tr("登录成功"), true);
-        qDebug()<< "user is" << jsonObj["user"].toString();
-        qDebug()<< "token is" << jsonObj["token"].toString();
+        ServerInfo s;
+        s.Uid = jsonObj["uid"].toInt();
+        s.Host = jsonObj["host"].toString();
+        s.Port = jsonObj["port"].toString();
+        s.Token = jsonObj["token"].toString();
+
+        uid_ = s.Uid;
+        token_ = s.Token;
+        qDebug()<< "user is " << jsonObj["user"].toString() << " uid is " << s.Uid <<" host is "
+                 << s.Host << " Port is " << s.Port << " Token is " << s.Token;
+        emit sig_connect_tcp(s);
     });
 }
 
@@ -121,10 +135,17 @@ bool LoginDialog::checkPassValid()
     return true;
 }
 
+void LoginDialog::enableBtn(bool enabled)
+{
+    ui->login_btn->setEnabled(enabled);
+    ui->reg_btn->setEnabled(enabled);
+}
+
 void LoginDialog::slot_login_mod_finish(RequestId id, QString res, ErrorCodes err)
 {
     if(err != ErrorCodes::SUCCESS){
         showTip(tr("网络请求错误"), false);
+        enableBtn(true);
         return;
     }
 
@@ -134,6 +155,25 @@ void LoginDialog::slot_login_mod_finish(RequestId id, QString res, ErrorCodes er
         return;
     }
     _handlers[id](jsonDoc.object());
+}
+
+void LoginDialog::slot_tcp_con_finish(bool ok)
+{
+    if (!ok) {
+        showTip(tr("网络异常"),false);
+        enableBtn(true);
+        return;
+    }
+
+    showTip(tr("聊天服务器连接成功，正在登录..."),true);
+    QJsonObject jsonObj;
+    jsonObj["uid"] = uid_;
+    jsonObj["token"] = token_;
+
+    QJsonDocument doc(jsonObj);
+    auto jsonStr = QString::fromUtf8(doc.toJson(QJsonDocument::Indented));
+
+    emit TcpMgr::GetInstance()->sig_send_data(RequestId::ID_CHAT_LOGIN, jsonStr);
 }
 
 void LoginDialog::on_reg_btn_clicked()
@@ -154,6 +194,7 @@ void LoginDialog::on_login_btn_clicked()
         return;
     }
 
+    enableBtn(false);
     QJsonObject json_obj;
     json_obj["email"] =  ui->email_edit->text();
     json_obj["passwd"] = ui->pwd_edit->text();

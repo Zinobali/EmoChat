@@ -17,3 +17,8 @@ x64/
 
 # 忽略 node_modules 目录
 node_modules/
+
+# 忽略静态库（todo）还没完成
+CommonLib/
+# 忽略TcpTestClient
+TcpTestClient/
