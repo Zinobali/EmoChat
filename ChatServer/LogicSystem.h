@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string_view>
 #include "Singleton.h"
 #include <map>
 #include <functional>
@@ -8,6 +7,8 @@
 #include "MsgNode.h"
 #include "CSession.h"
 #include "queue"
+
+
 
 class LogicNode {
     friend class LogicSystem;
@@ -20,6 +21,7 @@ private:
 
 typedef std::function<void(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data)> MsgHandler;
 
+struct UserInfo;
 class LogicSystem :public Singleton<LogicSystem>
 {
     friend class Singleton<LogicSystem>;
@@ -41,5 +43,6 @@ private:
     std::condition_variable cv_;
     std::atomic_bool b_stop_;
     std::map<MSG_IDS, MsgHandler> handlers_;
+    std::map<int, std::shared_ptr<UserInfo>> users_;
 };
 

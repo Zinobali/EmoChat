@@ -4,6 +4,9 @@
 #include <json/value.h>
 #include <json/reader.h>
 #include "global.h"
+#include "StatusGrpcClient.h"
+#include "RedisMgr.h"
+#include "MySQLMgr.h"
 
 LogicNode::LogicNode(std::shared_ptr<CSession> session, std::shared_ptr<RecvNode> recv_node)
     :session_(session), recv_node_(recv_node) {}
@@ -53,10 +56,42 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t
     Json::Value root;
     Json::Reader reader;
     reader.parse(msg_data, root);
-    std::cout << "user login uid is: " << root["uid"].asInt() << ", user token  is: " << root["token"].asString() << std::endl;
+    auto uid = root["uid"].asInt();
+    auto token = root["token"].asString();
+    std::cout << "user login uid is: " << uid << ", user token  is: " << token << std::endl;
+    // 从状态服务器获取用户信息
+    auto rsp = StatusGrpcClient::GetInstance()->Login(uid, token);
+    // 返回客户端
+    Json::Value rsp_root;
+    Defer defer([&rsp_root, this, session]() {
+        auto return_id = toInt(MSG_IDS::MSG_CHAT_LOGIN_RSP);
+        auto return_str = rsp_root.toStyledString();
+        session->Send(return_id, return_str);
+        });
 
-    auto return_str = root.toStyledString();
-    session->Send(msg_id, return_str);
+    rsp_root["error"] = rsp.error();
+    if (static_cast<ErrorCodes>(rsp.error()) != ErrorCodes::Success) {
+        return;
+    }
+
+    auto iter = users_.find(uid);
+    std::shared_ptr<UserInfo> user_info;
+    if (iter == users_.end()) {
+        // 从mysql获取用户信息
+        user_info = MySQLMgr::GetInstance()->GetUser(uid);
+        if (!user_info) {
+            rsp_root["error"] = toInt(ErrorCodes::UidInvalid);
+            return;
+        }
+
+        users_[uid] = user_info;
+    } else {
+        user_info = iter->second;
+    }
+
+    rsp_root["uid"] = uid;
+    rsp_root["token"] = rsp.token();
+    rsp_root["name"] = user_info->name;
 }
 
 void LogicSystem::HandleMsg() {

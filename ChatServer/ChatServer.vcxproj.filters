@@ -42,6 +42,15 @@
     <ClCompile Include="MsgNode.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="StatusGrpcClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisMgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQLMgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsioIOServicePool.h">
@@ -72,6 +81,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusGrpcClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisMgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQLMgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="threadsafe_queue.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

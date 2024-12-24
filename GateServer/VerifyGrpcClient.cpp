@@ -25,7 +25,7 @@ VerifyGrpcClient::VerifyGrpcClient() {
     auto& configMgr = ConfigMgr::GetInstance();
     std::string host = configMgr["VerifyServer"]["Host"];
     std::string port = configMgr["VerifyServer"]["Port"];
-    pool_.reset(new gRPCPool(5, host, port));
+    pool_.reset(new gRPCPool(2, host, port));
 }
 
 gRPCPool::gRPCPool(std::size_t pool_size, std::string host, std::string port)

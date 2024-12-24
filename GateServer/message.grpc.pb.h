@@ -27,7 +27,6 @@
 
 namespace message {
 
-// The verify service definition.
 class VerifyService final {
  public:
   static constexpr char const* service_full_name() {
@@ -235,7 +234,6 @@ class VerifyService final {
   typedef WithStreamedUnaryMethod_GetVerifyCode<Service > StreamedService;
 };
 
-// The chat server service definition.
 class StatusService final {
  public:
   static constexpr char const* service_full_name() {

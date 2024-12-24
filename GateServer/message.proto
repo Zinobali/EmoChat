@@ -3,10 +3,6 @@ syntax = "proto3";
 package message;
 
 // The verify service definition.
-service VerifyService {
-    rpc GetVerifyCode (GetVerifyReq) returns (GetVerifyRsp) {}
-}
-
 message GetVerifyReq {
     string email = 1;
 }
@@ -17,11 +13,11 @@ message GetVerifyRsp {
     string code = 3;
 }
 
-// The chat server service definition.
-service StatusService {
-    rpc GetChatServer (GetChatServerReq) returns (GetChatServerRsp) {}
+service VerifyService {
+    rpc GetVerifyCode (GetVerifyReq) returns (GetVerifyRsp) {}
 }
 
+// The chat server service definition.
 message GetChatServerReq {
     int32 uid = 1;
 }
@@ -31,4 +27,8 @@ message GetChatServerRsp {
     string host = 2;
     string port = 3;
     string token = 4;
+}
+
+service StatusService {
+    rpc GetChatServer(GetChatServerReq) returns (GetChatServerRsp) {}
 }

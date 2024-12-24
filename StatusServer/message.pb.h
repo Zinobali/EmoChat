@@ -62,12 +62,12 @@ extern GetChatServerReqDefaultTypeInternal _GetChatServerReq_default_instance_;
 class GetChatServerRsp;
 struct GetChatServerRspDefaultTypeInternal;
 extern GetChatServerRspDefaultTypeInternal _GetChatServerRsp_default_instance_;
-class GetVerifyReq;
-struct GetVerifyReqDefaultTypeInternal;
-extern GetVerifyReqDefaultTypeInternal _GetVerifyReq_default_instance_;
-class GetVerifyRsp;
-struct GetVerifyRspDefaultTypeInternal;
-extern GetVerifyRspDefaultTypeInternal _GetVerifyRsp_default_instance_;
+class LoginReq;
+struct LoginReqDefaultTypeInternal;
+extern LoginReqDefaultTypeInternal _LoginReq_default_instance_;
+class LoginRsp;
+struct LoginRspDefaultTypeInternal;
+extern LoginRspDefaultTypeInternal _LoginRsp_default_instance_;
 }  // namespace message
 namespace google {
 namespace protobuf {
@@ -81,26 +81,26 @@ namespace message {
 
 // -------------------------------------------------------------------
 
-class GetVerifyRsp final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:message.GetVerifyRsp) */ {
+class LoginRsp final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:message.LoginRsp) */ {
  public:
-  inline GetVerifyRsp() : GetVerifyRsp(nullptr) {}
-  ~GetVerifyRsp() override;
+  inline LoginRsp() : LoginRsp(nullptr) {}
+  ~LoginRsp() override;
   template<typename = void>
-  explicit PROTOBUF_CONSTEXPR GetVerifyRsp(::google::protobuf::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR LoginRsp(::google::protobuf::internal::ConstantInitialized);
 
-  inline GetVerifyRsp(const GetVerifyRsp& from)
-      : GetVerifyRsp(nullptr, from) {}
-  GetVerifyRsp(GetVerifyRsp&& from) noexcept
-    : GetVerifyRsp() {
+  inline LoginRsp(const LoginRsp& from)
+      : LoginRsp(nullptr, from) {}
+  LoginRsp(LoginRsp&& from) noexcept
+    : LoginRsp() {
     *this = ::std::move(from);
   }
 
-  inline GetVerifyRsp& operator=(const GetVerifyRsp& from) {
+  inline LoginRsp& operator=(const LoginRsp& from) {
     CopyFrom(from);
     return *this;
   }
-  inline GetVerifyRsp& operator=(GetVerifyRsp&& from) noexcept {
+  inline LoginRsp& operator=(LoginRsp&& from) noexcept {
     if (this == &from) return *this;
     if (GetArena() == from.GetArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -132,20 +132,20 @@ class GetVerifyRsp final :
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const GetVerifyRsp& default_instance() {
+  static const LoginRsp& default_instance() {
     return *internal_default_instance();
   }
-  static inline const GetVerifyRsp* internal_default_instance() {
-    return reinterpret_cast<const GetVerifyRsp*>(
-               &_GetVerifyRsp_default_instance_);
+  static inline const LoginRsp* internal_default_instance() {
+    return reinterpret_cast<const LoginRsp*>(
+               &_LoginRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    3;
 
-  friend void swap(GetVerifyRsp& a, GetVerifyRsp& b) {
+  friend void swap(LoginRsp& a, LoginRsp& b) {
     a.Swap(&b);
   }
-  inline void Swap(GetVerifyRsp* other) {
+  inline void Swap(LoginRsp* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetArena() != nullptr &&
@@ -158,7 +158,7 @@ class GetVerifyRsp final :
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(GetVerifyRsp* other) {
+  void UnsafeArenaSwap(LoginRsp* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -166,14 +166,14 @@ class GetVerifyRsp final :
 
   // implements Message ----------------------------------------------
 
-  GetVerifyRsp* New(::google::protobuf::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<GetVerifyRsp>(arena);
+  LoginRsp* New(::google::protobuf::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<LoginRsp>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const GetVerifyRsp& from);
+  void CopyFrom(const LoginRsp& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom( const GetVerifyRsp& from) {
-    GetVerifyRsp::MergeImpl(*this, from);
+  void MergeFrom( const LoginRsp& from) {
+    LoginRsp::MergeImpl(*this, from);
   }
   private:
   static void MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg);
@@ -191,16 +191,16 @@ class GetVerifyRsp final :
   ::google::protobuf::internal::CachedSize* AccessCachedSize() const final;
   void SharedCtor(::google::protobuf::Arena* arena);
   void SharedDtor();
-  void InternalSwap(GetVerifyRsp* other);
+  void InternalSwap(LoginRsp* other);
 
   private:
   friend class ::google::protobuf::internal::AnyMetadata;
   static ::absl::string_view FullMessageName() {
-    return "message.GetVerifyRsp";
+    return "message.LoginRsp";
   }
   protected:
-  explicit GetVerifyRsp(::google::protobuf::Arena* arena);
-  GetVerifyRsp(::google::protobuf::Arena* arena, const GetVerifyRsp& from);
+  explicit LoginRsp(::google::protobuf::Arena* arena);
+  LoginRsp(::google::protobuf::Arena* arena, const LoginRsp& from);
   public:
 
   static const ClassData _class_data_;
@@ -213,40 +213,24 @@ class GetVerifyRsp final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kEmailFieldNumber = 2,
-    kCodeFieldNumber = 3,
+    kTokenFieldNumber = 3,
     kErrorFieldNumber = 1,
+    kUidFieldNumber = 2,
   };
-  // string email = 2;
-  void clear_email() ;
-  const std::string& email() const;
+  // string token = 3;
+  void clear_token() ;
+  const std::string& token() const;
   template <typename Arg_ = const std::string&, typename... Args_>
-  void set_email(Arg_&& arg, Args_... args);
-  std::string* mutable_email();
-  PROTOBUF_NODISCARD std::string* release_email();
-  void set_allocated_email(std::string* value);
+  void set_token(Arg_&& arg, Args_... args);
+  std::string* mutable_token();
+  PROTOBUF_NODISCARD std::string* release_token();
+  void set_allocated_token(std::string* value);
 
   private:
-  const std::string& _internal_email() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_email(
+  const std::string& _internal_token() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_token(
       const std::string& value);
-  std::string* _internal_mutable_email();
-
-  public:
-  // string code = 3;
-  void clear_code() ;
-  const std::string& code() const;
-  template <typename Arg_ = const std::string&, typename... Args_>
-  void set_code(Arg_&& arg, Args_... args);
-  std::string* mutable_code();
-  PROTOBUF_NODISCARD std::string* release_code();
-  void set_allocated_code(std::string* value);
-
-  private:
-  const std::string& _internal_code() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_code(
-      const std::string& value);
-  std::string* _internal_mutable_code();
+  std::string* _internal_mutable_token();
 
   public:
   // int32 error = 1;
@@ -259,14 +243,24 @@ class GetVerifyRsp final :
   void _internal_set_error(::int32_t value);
 
   public:
-  // @@protoc_insertion_point(class_scope:message.GetVerifyRsp)
+  // int32 uid = 2;
+  void clear_uid() ;
+  ::int32_t uid() const;
+  void set_uid(::int32_t value);
+
+  private:
+  ::int32_t _internal_uid() const;
+  void _internal_set_uid(::int32_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:message.LoginRsp)
  private:
   class _Internal;
 
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
       2, 3, 0,
-      38, 2>
+      30, 2>
       _table_;
   friend class ::google::protobuf::MessageLite;
   friend class ::google::protobuf::Arena;
@@ -282,9 +276,9 @@ class GetVerifyRsp final :
                               ::google::protobuf::Arena* arena);
         inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                               ::google::protobuf::Arena* arena, const Impl_& from);
-    ::google::protobuf::internal::ArenaStringPtr email_;
-    ::google::protobuf::internal::ArenaStringPtr code_;
+    ::google::protobuf::internal::ArenaStringPtr token_;
     ::int32_t error_;
+    ::int32_t uid_;
     mutable ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -292,26 +286,26 @@ class GetVerifyRsp final :
   friend struct ::TableStruct_message_2eproto;
 };// -------------------------------------------------------------------
 
-class GetVerifyReq final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:message.GetVerifyReq) */ {
+class LoginReq final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:message.LoginReq) */ {
  public:
-  inline GetVerifyReq() : GetVerifyReq(nullptr) {}
-  ~GetVerifyReq() override;
+  inline LoginReq() : LoginReq(nullptr) {}
+  ~LoginReq() override;
   template<typename = void>
-  explicit PROTOBUF_CONSTEXPR GetVerifyReq(::google::protobuf::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR LoginReq(::google::protobuf::internal::ConstantInitialized);
 
-  inline GetVerifyReq(const GetVerifyReq& from)
-      : GetVerifyReq(nullptr, from) {}
-  GetVerifyReq(GetVerifyReq&& from) noexcept
-    : GetVerifyReq() {
+  inline LoginReq(const LoginReq& from)
+      : LoginReq(nullptr, from) {}
+  LoginReq(LoginReq&& from) noexcept
+    : LoginReq() {
     *this = ::std::move(from);
   }
 
-  inline GetVerifyReq& operator=(const GetVerifyReq& from) {
+  inline LoginReq& operator=(const LoginReq& from) {
     CopyFrom(from);
     return *this;
   }
-  inline GetVerifyReq& operator=(GetVerifyReq&& from) noexcept {
+  inline LoginReq& operator=(LoginReq&& from) noexcept {
     if (this == &from) return *this;
     if (GetArena() == from.GetArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -343,20 +337,20 @@ class GetVerifyReq final :
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const GetVerifyReq& default_instance() {
+  static const LoginReq& default_instance() {
     return *internal_default_instance();
   }
-  static inline const GetVerifyReq* internal_default_instance() {
-    return reinterpret_cast<const GetVerifyReq*>(
-               &_GetVerifyReq_default_instance_);
+  static inline const LoginReq* internal_default_instance() {
+    return reinterpret_cast<const LoginReq*>(
+               &_LoginReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    2;
 
-  friend void swap(GetVerifyReq& a, GetVerifyReq& b) {
+  friend void swap(LoginReq& a, LoginReq& b) {
     a.Swap(&b);
   }
-  inline void Swap(GetVerifyReq* other) {
+  inline void Swap(LoginReq* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetArena() != nullptr &&
@@ -369,7 +363,7 @@ class GetVerifyReq final :
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(GetVerifyReq* other) {
+  void UnsafeArenaSwap(LoginReq* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -377,14 +371,14 @@ class GetVerifyReq final :
 
   // implements Message ----------------------------------------------
 
-  GetVerifyReq* New(::google::protobuf::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<GetVerifyReq>(arena);
+  LoginReq* New(::google::protobuf::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<LoginReq>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const GetVerifyReq& from);
+  void CopyFrom(const LoginReq& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom( const GetVerifyReq& from) {
-    GetVerifyReq::MergeImpl(*this, from);
+  void MergeFrom( const LoginReq& from) {
+    LoginReq::MergeImpl(*this, from);
   }
   private:
   static void MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg);
@@ -402,16 +396,16 @@ class GetVerifyReq final :
   ::google::protobuf::internal::CachedSize* AccessCachedSize() const final;
   void SharedCtor(::google::protobuf::Arena* arena);
   void SharedDtor();
-  void InternalSwap(GetVerifyReq* other);
+  void InternalSwap(LoginReq* other);
 
   private:
   friend class ::google::protobuf::internal::AnyMetadata;
   static ::absl::string_view FullMessageName() {
-    return "message.GetVerifyReq";
+    return "message.LoginReq";
   }
   protected:
-  explicit GetVerifyReq(::google::protobuf::Arena* arena);
-  GetVerifyReq(::google::protobuf::Arena* arena, const GetVerifyReq& from);
+  explicit LoginReq(::google::protobuf::Arena* arena);
+  LoginReq(::google::protobuf::Arena* arena, const LoginReq& from);
   public:
 
   static const ClassData _class_data_;
@@ -424,32 +418,43 @@ class GetVerifyReq final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kEmailFieldNumber = 1,
+    kTokenFieldNumber = 2,
+    kUidFieldNumber = 1,
   };
-  // string email = 1;
-  void clear_email() ;
-  const std::string& email() const;
+  // string token = 2;
+  void clear_token() ;
+  const std::string& token() const;
   template <typename Arg_ = const std::string&, typename... Args_>
-  void set_email(Arg_&& arg, Args_... args);
-  std::string* mutable_email();
-  PROTOBUF_NODISCARD std::string* release_email();
-  void set_allocated_email(std::string* value);
+  void set_token(Arg_&& arg, Args_... args);
+  std::string* mutable_token();
+  PROTOBUF_NODISCARD std::string* release_token();
+  void set_allocated_token(std::string* value);
 
   private:
-  const std::string& _internal_email() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_email(
+  const std::string& _internal_token() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_token(
       const std::string& value);
-  std::string* _internal_mutable_email();
+  std::string* _internal_mutable_token();
 
   public:
-  // @@protoc_insertion_point(class_scope:message.GetVerifyReq)
+  // int32 uid = 1;
+  void clear_uid() ;
+  ::int32_t uid() const;
+  void set_uid(::int32_t value);
+
+  private:
+  ::int32_t _internal_uid() const;
+  void _internal_set_uid(::int32_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:message.LoginReq)
  private:
   class _Internal;
 
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 0,
-      34, 2>
+      1, 2, 0,
+      30, 2>
       _table_;
   friend class ::google::protobuf::MessageLite;
   friend class ::google::protobuf::Arena;
@@ -465,7 +470,8 @@ class GetVerifyReq final :
                               ::google::protobuf::Arena* arena);
         inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                               ::google::protobuf::Arena* arena, const Impl_& from);
-    ::google::protobuf::internal::ArenaStringPtr email_;
+    ::google::protobuf::internal::ArenaStringPtr token_;
+    ::int32_t uid_;
     mutable ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -532,7 +538,7 @@ class GetChatServerRsp final :
                &_GetChatServerRsp_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    1;
 
   friend void swap(GetChatServerRsp& a, GetChatServerRsp& b) {
     a.Swap(&b);
@@ -761,7 +767,7 @@ class GetChatServerReq final :
                &_GetChatServerReq_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    0;
 
   friend void swap(GetChatServerReq& a, GetChatServerReq& b) {
     a.Swap(&b);
@@ -889,196 +895,6 @@ class GetChatServerReq final :
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// GetVerifyReq
-
-// string email = 1;
-inline void GetVerifyReq::clear_email() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.email_.ClearToEmpty();
-}
-inline const std::string& GetVerifyReq::email() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:message.GetVerifyReq.email)
-  return _internal_email();
-}
-template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void GetVerifyReq::set_email(Arg_&& arg,
-                                                     Args_... args) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.email_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:message.GetVerifyReq.email)
-}
-inline std::string* GetVerifyReq::mutable_email() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_email();
-  // @@protoc_insertion_point(field_mutable:message.GetVerifyReq.email)
-  return _s;
-}
-inline const std::string& GetVerifyReq::_internal_email() const {
-  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
-  return _impl_.email_.Get();
-}
-inline void GetVerifyReq::_internal_set_email(const std::string& value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.email_.Set(value, GetArena());
-}
-inline std::string* GetVerifyReq::_internal_mutable_email() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  return _impl_.email_.Mutable( GetArena());
-}
-inline std::string* GetVerifyReq::release_email() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  // @@protoc_insertion_point(field_release:message.GetVerifyReq.email)
-  return _impl_.email_.Release();
-}
-inline void GetVerifyReq::set_allocated_email(std::string* value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.email_.SetAllocated(value, GetArena());
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-        if (_impl_.email_.IsDefault()) {
-          _impl_.email_.Set("", GetArena());
-        }
-  #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:message.GetVerifyReq.email)
-}
-
-// -------------------------------------------------------------------
-
-// GetVerifyRsp
-
-// int32 error = 1;
-inline void GetVerifyRsp::clear_error() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.error_ = 0;
-}
-inline ::int32_t GetVerifyRsp::error() const {
-  // @@protoc_insertion_point(field_get:message.GetVerifyRsp.error)
-  return _internal_error();
-}
-inline void GetVerifyRsp::set_error(::int32_t value) {
-  _internal_set_error(value);
-  // @@protoc_insertion_point(field_set:message.GetVerifyRsp.error)
-}
-inline ::int32_t GetVerifyRsp::_internal_error() const {
-  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
-  return _impl_.error_;
-}
-inline void GetVerifyRsp::_internal_set_error(::int32_t value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.error_ = value;
-}
-
-// string email = 2;
-inline void GetVerifyRsp::clear_email() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.email_.ClearToEmpty();
-}
-inline const std::string& GetVerifyRsp::email() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:message.GetVerifyRsp.email)
-  return _internal_email();
-}
-template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void GetVerifyRsp::set_email(Arg_&& arg,
-                                                     Args_... args) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.email_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:message.GetVerifyRsp.email)
-}
-inline std::string* GetVerifyRsp::mutable_email() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_email();
-  // @@protoc_insertion_point(field_mutable:message.GetVerifyRsp.email)
-  return _s;
-}
-inline const std::string& GetVerifyRsp::_internal_email() const {
-  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
-  return _impl_.email_.Get();
-}
-inline void GetVerifyRsp::_internal_set_email(const std::string& value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.email_.Set(value, GetArena());
-}
-inline std::string* GetVerifyRsp::_internal_mutable_email() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  return _impl_.email_.Mutable( GetArena());
-}
-inline std::string* GetVerifyRsp::release_email() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  // @@protoc_insertion_point(field_release:message.GetVerifyRsp.email)
-  return _impl_.email_.Release();
-}
-inline void GetVerifyRsp::set_allocated_email(std::string* value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.email_.SetAllocated(value, GetArena());
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-        if (_impl_.email_.IsDefault()) {
-          _impl_.email_.Set("", GetArena());
-        }
-  #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:message.GetVerifyRsp.email)
-}
-
-// string code = 3;
-inline void GetVerifyRsp::clear_code() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.code_.ClearToEmpty();
-}
-inline const std::string& GetVerifyRsp::code() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:message.GetVerifyRsp.code)
-  return _internal_code();
-}
-template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void GetVerifyRsp::set_code(Arg_&& arg,
-                                                     Args_... args) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.code_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:message.GetVerifyRsp.code)
-}
-inline std::string* GetVerifyRsp::mutable_code() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_code();
-  // @@protoc_insertion_point(field_mutable:message.GetVerifyRsp.code)
-  return _s;
-}
-inline const std::string& GetVerifyRsp::_internal_code() const {
-  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
-  return _impl_.code_.Get();
-}
-inline void GetVerifyRsp::_internal_set_code(const std::string& value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  _impl_.code_.Set(value, GetArena());
-}
-inline std::string* GetVerifyRsp::_internal_mutable_code() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  ;
-  return _impl_.code_.Mutable( GetArena());
-}
-inline std::string* GetVerifyRsp::release_code() {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  // @@protoc_insertion_point(field_release:message.GetVerifyRsp.code)
-  return _impl_.code_.Release();
-}
-inline void GetVerifyRsp::set_allocated_code(std::string* value) {
-  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.code_.SetAllocated(value, GetArena());
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-        if (_impl_.code_.IsDefault()) {
-          _impl_.code_.Set("", GetArena());
-        }
-  #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:message.GetVerifyRsp.code)
-}
-
 // -------------------------------------------------------------------
 
 // GetChatServerReq
@@ -1290,6 +1106,189 @@ inline void GetChatServerRsp::set_allocated_token(std::string* value) {
         }
   #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:message.GetChatServerRsp.token)
+}
+
+// -------------------------------------------------------------------
+
+// LoginReq
+
+// int32 uid = 1;
+inline void LoginReq::clear_uid() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.uid_ = 0;
+}
+inline ::int32_t LoginReq::uid() const {
+  // @@protoc_insertion_point(field_get:message.LoginReq.uid)
+  return _internal_uid();
+}
+inline void LoginReq::set_uid(::int32_t value) {
+  _internal_set_uid(value);
+  // @@protoc_insertion_point(field_set:message.LoginReq.uid)
+}
+inline ::int32_t LoginReq::_internal_uid() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return _impl_.uid_;
+}
+inline void LoginReq::_internal_set_uid(::int32_t value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.uid_ = value;
+}
+
+// string token = 2;
+inline void LoginReq::clear_token() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.token_.ClearToEmpty();
+}
+inline const std::string& LoginReq::token() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:message.LoginReq.token)
+  return _internal_token();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void LoginReq::set_token(Arg_&& arg,
+                                                     Args_... args) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.token_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:message.LoginReq.token)
+}
+inline std::string* LoginReq::mutable_token() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_token();
+  // @@protoc_insertion_point(field_mutable:message.LoginReq.token)
+  return _s;
+}
+inline const std::string& LoginReq::_internal_token() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return _impl_.token_.Get();
+}
+inline void LoginReq::_internal_set_token(const std::string& value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.token_.Set(value, GetArena());
+}
+inline std::string* LoginReq::_internal_mutable_token() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  return _impl_.token_.Mutable( GetArena());
+}
+inline std::string* LoginReq::release_token() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  // @@protoc_insertion_point(field_release:message.LoginReq.token)
+  return _impl_.token_.Release();
+}
+inline void LoginReq::set_allocated_token(std::string* value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.token_.SetAllocated(value, GetArena());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+        if (_impl_.token_.IsDefault()) {
+          _impl_.token_.Set("", GetArena());
+        }
+  #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:message.LoginReq.token)
+}
+
+// -------------------------------------------------------------------
+
+// LoginRsp
+
+// int32 error = 1;
+inline void LoginRsp::clear_error() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.error_ = 0;
+}
+inline ::int32_t LoginRsp::error() const {
+  // @@protoc_insertion_point(field_get:message.LoginRsp.error)
+  return _internal_error();
+}
+inline void LoginRsp::set_error(::int32_t value) {
+  _internal_set_error(value);
+  // @@protoc_insertion_point(field_set:message.LoginRsp.error)
+}
+inline ::int32_t LoginRsp::_internal_error() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return _impl_.error_;
+}
+inline void LoginRsp::_internal_set_error(::int32_t value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.error_ = value;
+}
+
+// int32 uid = 2;
+inline void LoginRsp::clear_uid() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.uid_ = 0;
+}
+inline ::int32_t LoginRsp::uid() const {
+  // @@protoc_insertion_point(field_get:message.LoginRsp.uid)
+  return _internal_uid();
+}
+inline void LoginRsp::set_uid(::int32_t value) {
+  _internal_set_uid(value);
+  // @@protoc_insertion_point(field_set:message.LoginRsp.uid)
+}
+inline ::int32_t LoginRsp::_internal_uid() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return _impl_.uid_;
+}
+inline void LoginRsp::_internal_set_uid(::int32_t value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.uid_ = value;
+}
+
+// string token = 3;
+inline void LoginRsp::clear_token() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.token_.ClearToEmpty();
+}
+inline const std::string& LoginRsp::token() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:message.LoginRsp.token)
+  return _internal_token();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void LoginRsp::set_token(Arg_&& arg,
+                                                     Args_... args) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.token_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:message.LoginRsp.token)
+}
+inline std::string* LoginRsp::mutable_token() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_token();
+  // @@protoc_insertion_point(field_mutable:message.LoginRsp.token)
+  return _s;
+}
+inline const std::string& LoginRsp::_internal_token() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return _impl_.token_.Get();
+}
+inline void LoginRsp::_internal_set_token(const std::string& value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.token_.Set(value, GetArena());
+}
+inline std::string* LoginRsp::_internal_mutable_token() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  return _impl_.token_.Mutable( GetArena());
+}
+inline std::string* LoginRsp::release_token() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  // @@protoc_insertion_point(field_release:message.LoginRsp.token)
+  return _impl_.token_.Release();
+}
+inline void LoginRsp::set_allocated_token(std::string* value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.token_.SetAllocated(value, GetArena());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+        if (_impl_.token_.IsDefault()) {
+          _impl_.token_.Set("", GetArena());
+        }
+  #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:message.LoginRsp.token)
 }
 
 #ifdef __GNUC__

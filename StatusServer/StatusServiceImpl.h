@@ -1,6 +1,7 @@
 #pragma once
 #include <grpcpp/grpcpp.h>
 #include "message.grpc.pb.h"
+#include <unordered_map>
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -9,21 +10,38 @@ using grpc::Status;
 
 using message::GetChatServerReq;
 using message::GetChatServerRsp;
+using message::LoginReq;
+using message::LoginRsp;
 using message::StatusService;
 
-struct ChatServer
+class ChatServer
 {
-    std::string host;
-    std::string port;
+public:
+    ChatServer();
+    ChatServer(const ChatServer& other);
+    ChatServer& operator=(const ChatServer& other);
+
+public:
+    std::string host_;
+    std::string port_;
+    std::string name_;
+    int conn_count_;
 };
 
 class StatusServiceImpl : public StatusService::Service
 {
 public:
     StatusServiceImpl();
-    virtual Status GetChatServer(ServerContext* context, const GetChatServerReq* request, GetChatServerRsp* response) override;
+    Status GetChatServer(ServerContext* context, const GetChatServerReq* request, GetChatServerRsp* response) override;
+    Status Login(ServerContext* context, const LoginReq* request, LoginRsp* response) override;
 
-    std::vector<ChatServer> servers_;
-    int server_index_;
+private:
+    void insertToken(int uid, std::string token);
+    std::shared_ptr<ChatServer> getChatServer();
+    std::string generate_token();
+
+private:
+    std::unordered_map<std::string, std::shared_ptr<ChatServer>> servers_;
+    std::mutex svr_mtx_;
 };
 
