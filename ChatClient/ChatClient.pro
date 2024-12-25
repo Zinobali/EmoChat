@@ -13,6 +13,7 @@ DESTDIR = ./bin
 
 SOURCES += \
     chatdialog.cpp \
+    clickedbtn.cpp \
     clickedlabel.cpp \
     global.cpp \
     httpmgr.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     chatdialog.h \
+    clickedbtn.h \
     clickedlabel.h \
     global.h \
     httpmgr.h \

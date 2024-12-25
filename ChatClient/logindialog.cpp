@@ -13,7 +13,7 @@ LoginDialog::LoginDialog(QWidget *parent)
     initUiDesign();
     initUiSignals();
     initHttpHandlers();
-    testFunc();
+    testFunc(); // 测试函数，后续删除
 }
 
 LoginDialog::~LoginDialog()
@@ -183,7 +183,7 @@ void LoginDialog::on_reg_btn_clicked()
     emit switchRegister(this);
 }
 
-void LoginDialog::testFunc()
+void LoginDialog::testFunc() // 测试函数，后续删除
 {
     ui->email_edit->setText("1665799927@qq.com");
     ui->pwd_edit->setText("123456");

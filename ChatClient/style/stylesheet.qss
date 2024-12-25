@@ -35,10 +35,27 @@ QDialog#LoginDialog{
 #confirm_visible[state='visible_hover']{
    border-image: url(:/images/visible_hover.png);
 }
+
 /* 登录页面忘记密码 */
 #forget_label[state='normal'],#forget_label[state='selected']{
     color:black;
 }
 #forget_label[state='hover'], #forget_label[state='selected_hover']{
     color: rgb(42, 112, 241);
+}
+
+/* 聊天页面侧边栏 */
+#side_bar{
+    background-color: rgb(46,46,46);
+}
+
+/* 聊天页面添加好友按钮 */
+#add_btn[state='normal']{
+    border-image: url(:/images/add_friend_normal.png);
+}
+#add_btn[state='hover']{
+    border-image: url(:/images/add_friend_hover.png);
+}
+#add_btn[state='press']{
+    border-image: url(:/images/add_friend_press.png);
 }

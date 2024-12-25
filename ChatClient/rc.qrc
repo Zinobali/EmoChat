@@ -8,5 +8,8 @@
         <file>images/visible.png</file>
         <file>images/visible_hover.png</file>
         <file>images/pussy-transparent.png</file>
+        <file>images/add_friend_hover.png</file>
+        <file>images/add_friend_normal.png</file>
+        <file>images/add_friend_press.png</file>
     </qresource>
 </RCC>

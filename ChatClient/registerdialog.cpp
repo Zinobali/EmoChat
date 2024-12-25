@@ -11,7 +11,7 @@ RegisterDialog::RegisterDialog(QWidget *parent)
     initUiDesign();
     initHttpHandlers();
     initUiSignals();
-    testEditInfo();
+    testEditInfo(); // 测试函数，后续删除
 }
 
 RegisterDialog::~RegisterDialog()
@@ -222,7 +222,7 @@ bool RegisterDialog::validateFields()
     return true;
 }
 
-void RegisterDialog::testEditInfo()
+void RegisterDialog::testEditInfo() // 测试函数，后续删除
 {
     ui->user_edit->setText("zinobali");
     ui->email_edit->setText("1665799927@qq.com");

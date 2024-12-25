@@ -2,7 +2,16 @@
 #include <QDebug>
 
 UserMgr::UserMgr()
-{}
+{
+    test_function(); // 测试函数，后续删除
+}
+
+void UserMgr::test_function() // 测试函数，后续删除
+{
+    uid_ = 43998;
+    token_ = "ahoaghaoigaoighadg";
+    name_ = "旻山君";
+}
 
 UserMgr::~UserMgr()
 {

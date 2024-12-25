@@ -7,6 +7,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    test_function(); // 测试函数，后续删除
+    return; // test 测试函数，后续删除
+
     //创建一个CentralWidget, 并将其设置为MainWindow的中心部件
     _login_dlg = new LoginDialog(this);
     setCentralWidget(_login_dlg);
@@ -63,6 +67,14 @@ void MainWindow::SlotSwitchChat()
     setCentralWidget(_chat_dlg);
     _chat_dlg->show();
     _login_dlg->hide();
-    setMinimumSize(QSize(1050,900));
+    setMinimumSize(QSize(1000, 650));
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+}
+
+void MainWindow::test_function() // 测试函数，后续删除
+{
+    _chat_dlg = new ChatDialog(this);
+    setCentralWidget(_chat_dlg);
+    setMinimumSize(QSize(800, 650));
     setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }

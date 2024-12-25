@@ -27,6 +27,8 @@ private:
     void SlotSwitchLogin(QWidget* w);
     void SlotSwitchChat();
 
+    void test_function(); // 测试函数，后续删除
+
 private:
     Ui::MainWindow *ui;
     LoginDialog* _login_dlg;

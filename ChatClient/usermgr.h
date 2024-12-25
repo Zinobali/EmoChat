@@ -20,6 +20,7 @@ public:
 
 private:
     explicit UserMgr();
+    void test_function(); // 测试函数，后续删除
 
 private:
     int uid_;

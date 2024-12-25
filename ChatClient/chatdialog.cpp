@@ -9,9 +9,7 @@ ChatDialog::ChatDialog(QWidget *parent)
 {
     ui->setupUi(this);
     initUI();
-    ui->label->setText(UserMgr::GetInstance()->name());
-    ui->label_2->setText(QString::number(UserMgr::GetInstance()->uid()));
-    ui->label_3->setText(UserMgr::GetInstance()->token());
+
 
 }
 
@@ -23,4 +21,5 @@ ChatDialog::~ChatDialog()
 void ChatDialog::initUI()
 {
     setWindowFlags(Qt::CustomizeWindowHint|Qt::FramelessWindowHint);
+    ui->add_btn->SetState("normal", "hover", "press"); //必须显示设置
 }

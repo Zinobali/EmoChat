@@ -18,7 +18,7 @@ public:
     ~LoginDialog();
 
 private:
-    void testFunc();
+    void testFunc(); // 测试函数，后续删除
     void initUiDesign();
     void initUiSignals();
     void initHttpHandlers();
