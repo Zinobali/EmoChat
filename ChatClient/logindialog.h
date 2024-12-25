@@ -29,7 +29,6 @@ private:
     bool checkPassValid();
     void enableBtn(bool enabled);
 
-
 signals:
     void switchRegister(QWidget* w);
     void switchReset(QWidget* w);
@@ -40,6 +39,7 @@ private slots:
     void slot_login_mod_finish(RequestId id, QString res, ErrorCodes err);
     void slot_tcp_con_finish(bool ok);
     void on_login_btn_clicked();
+    void slot_login_failed(ErrorCodes err);
 
 private:
     Ui::LoginDialog *ui;

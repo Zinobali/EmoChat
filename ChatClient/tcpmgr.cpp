@@ -1,52 +1,26 @@
 #include "tcpmgr.h"
 #include <QDataStream>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "usermgr.h"
 
 TcpMgr::TcpMgr(QObject *parent)
     : QObject{parent}, host_(""), port_(0),
     b_recv_pending_(false), msg_id_(0), msg_len_(0)
 {
-    InitSignals();
+    initSignals();
+    initHttpHandlers();
 }
 
-void TcpMgr::InitSignals()
+void TcpMgr::initSignals()
 {
     connect(&socket_, &QTcpSocket::connected, this, [&](){
         emit sig_con_success(true);
     });
 
     connect(&socket_, &QTcpSocket::readyRead, this, [&](){
-        buffer_.append(socket_.readAll());
-
-        QDataStream stream(&buffer_, QIODevice::ReadOnly);
-        stream.setVersion(QDataStream::Qt_5_15);
-        stream.setByteOrder(QDataStream::BigEndian);
-
-        while (true) {
-            // 解析头部
-            if(!b_recv_pending_){
-                int head_len = sizeof(msg_id_) + sizeof(msg_len_);
-                if(buffer_.size() < head_len){
-                    return;
-                }
-
-                stream >> msg_id_ >> msg_len_;
-
-                buffer_.remove(0, head_len);
-                qDebug() << "Receive Message ID:" << msg_id_ << ", Message Length:" << msg_len_;
-            }
-
-            //消息体
-            if(buffer_.size() < msg_len_){
-                b_recv_pending_ = true; // 数据不够，等待更多数据到达
-                return;
-            }
-
-            b_recv_pending_ = false;
-            QByteArray msg_body = buffer_.mid(0, msg_len_);
-            buffer_.remove(0, msg_len_);
-            qDebug() << "receive body msg is " << msg_body;
-        }
+        handleRead();
     });
 
     connect(&socket_, &QTcpSocket::errorOccurred, this, [&](auto error){
@@ -59,7 +33,7 @@ void TcpMgr::InitSignals()
     });
 
     /*
-     * 这里为什么采取信号槽，而不是public Send(RequestId reqId, QString data);
+     * 这里为什么采取信号槽，而不是void Send(RequestId reqId, QString data);
      * 因为信号槽的默认连接方式是Qt::AutoConnection，它会根据信号和槽所在的线程自动选择以下两种模式：
      * 1.直接连接（Direct Connection）
      *      如果信号和槽在同一个线程中执行，则信号的发射和槽的执行是同步的，没有队列。
@@ -69,6 +43,91 @@ void TcpMgr::InitSignals()
      *      这种模式下，信号和槽之间会有队列。
      */
     connect(this, &TcpMgr::sig_send_data, this, &TcpMgr::slot_send_data);
+}
+
+void TcpMgr::initHttpHandlers()
+{
+    handlers_.insert(RequestId::ID_CHAT_LOGIN_RSP,[this](RequestId id, QByteArray data){
+        handleChatLoginRsp(id, data);
+    });
+}
+
+void TcpMgr::handleRead()
+{
+    buffer_.append(socket_.readAll());
+
+    QDataStream stream(&buffer_, QIODevice::ReadOnly);
+    stream.setVersion(QDataStream::Qt_5_15);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    while (true) {
+        // 解析头部
+        if(!b_recv_pending_){
+            int head_len = sizeof(msg_id_) + sizeof(msg_len_);
+            if(buffer_.size() < head_len){
+                return;
+            }
+
+            stream >> msg_id_ >> msg_len_;
+
+            buffer_.remove(0, head_len);
+            qDebug() << "Receive Message ID:" << msg_id_ << ", Message Length:" << msg_len_;
+        }
+
+        //消息体
+        if(buffer_.size() < msg_len_){
+            b_recv_pending_ = true; // 数据不够，等待更多数据到达
+            return;
+        }
+
+        b_recv_pending_ = false;
+        QByteArray msg_body = buffer_.mid(0, msg_len_);
+        buffer_.remove(0, msg_len_);
+        qDebug() << "receive body msg is " << msg_body;
+
+        handleMsg(static_cast<RequestId>(msg_id_), msg_body);
+    }
+}
+
+void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
+{
+    qDebug() << "handle id is: " << toInt(id) << " data is " << data;
+    // 读取json
+    auto jsonDoc = QJsonDocument::fromJson(data);
+    if (jsonDoc.isNull() || !jsonDoc.isObject()) {
+        qDebug() << "Failed to create QJsonDocument.";
+        return;
+    }
+
+    auto jsonObj = jsonDoc.object();
+    if (!jsonObj.contains("error")) {
+        auto error = toInt(ErrorCodes::ERR_JSON);
+        qDebug() << "Login Failed, err is Json Parse Err" << error ;
+        return;
+    }
+
+    auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
+    if(error != ErrorCodes::SUCCESS){
+        qDebug() << "Login Failed, err is " << jsonObj["error"].toInt() ;
+        emit sig_login_failed(error);
+        return;
+    }
+
+    UserMgr::GetInstance()->setUid(jsonObj["uid"].toInt());
+    UserMgr::GetInstance()->setName(jsonObj["name"].toString());
+    UserMgr::GetInstance()->setToken(jsonObj["token"].toString());
+    emit sig_switch_chatdlg();
+}
+
+void TcpMgr::handleMsg(RequestId id, QByteArray data)
+{
+    auto iter = handlers_.find(id);
+    if(iter == handlers_.end()){
+        qDebug()<< "not found id ["<< toInt(id) << "] to handle";
+        return ;
+    }
+
+    iter.value()(id, data);
 }
 
 void TcpMgr::slot_tcp_connect(ServerInfo s)

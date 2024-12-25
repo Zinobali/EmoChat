@@ -21,7 +21,7 @@ public:
         return instance_;
     }
 
-    ~Singleton() = default;
+    virtual ~Singleton() = default;
 };
 
 template <typename T>

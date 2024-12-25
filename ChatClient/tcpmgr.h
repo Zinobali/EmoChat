@@ -5,6 +5,7 @@
 #include <singleton.h>
 #include <QTcpSocket>
 #include "global.h"
+#include <functional>
 
 struct ServerInfo{
     int Uid;
@@ -13,6 +14,7 @@ struct ServerInfo{
     QString Token;
 };
 
+typedef std::function<void(RequestId id, QByteArray data)> TcpHandler;
 class TcpMgr : public QObject, public Singleton<TcpMgr>,
                public std::enable_shared_from_this<TcpMgr>
 {
@@ -22,6 +24,13 @@ public:
 
 private:
     explicit TcpMgr(QObject *parent = nullptr);
+    void initSignals();
+    void initHttpHandlers();
+    void handleRead();
+    void handleChatLoginRsp(RequestId id, QByteArray data);
+    void handleMsg(RequestId id, QByteArray data);
+
+private:
     QTcpSocket socket_;
     QString host_;
     quint16 port_;
@@ -29,8 +38,7 @@ private:
     bool b_recv_pending_;
     quint16 msg_id_;
     quint16 msg_len_;
-
-    void InitSignals();
+    QMap<RequestId, TcpHandler> handlers_;
 
 public slots:
     void slot_tcp_connect(ServerInfo);
@@ -39,7 +47,8 @@ public slots:
 signals:
     void sig_con_success(bool ok);
     void sig_send_data(RequestId reqId, QString msg);
-    void sig_login_failed(int err);
+    void sig_login_failed(ErrorCodes err);
+    void sig_switch_chatdlg();
 };
 
 #endif // TCPMGR_H

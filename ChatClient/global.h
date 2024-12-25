@@ -66,6 +66,10 @@ enum class TipErr{
     TIP_USER_ERR = 6
 };
 
+constexpr int toInt(const RequestId& code) {
+    return static_cast<int>(code);
+}
+
 constexpr int toInt(const ErrorCodes& code) {
     return static_cast<int>(code);
 }

@@ -38,6 +38,8 @@ void LoginDialog::initUiSignals()
     connect(this, &LoginDialog::sig_connect_tcp, TcpMgr::GetInstance().get(), &TcpMgr::slot_tcp_connect);
     //TcpMgr连接成功信号
     connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_con_success, this, &LoginDialog::slot_tcp_con_finish);
+    //TcpMgr登录失败信号
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_login_failed, this, &LoginDialog::slot_login_failed);
 }
 
 void LoginDialog::initHttpHandlers()
@@ -200,5 +202,11 @@ void LoginDialog::on_login_btn_clicked()
     json_obj["passwd"] = ui->pwd_edit->text();
     HttpMgr::GetInstance()->PostHttpReq(QUrl(gate_url_prefix+"/user_login"),
                                         json_obj, RequestId::ID_LOGIN_USER, Modules::LOGINMOD);
+}
+
+void LoginDialog::slot_login_failed(ErrorCodes err)
+{
+    showTip(tr("登录失败, err is %1").arg(toInt(err)), false);
+    enableBtn(true);
 }
 
