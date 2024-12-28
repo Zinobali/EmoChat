@@ -11,5 +11,17 @@
         <file>images/add_friend_hover.png</file>
         <file>images/add_friend_normal.png</file>
         <file>images/add_friend_press.png</file>
+        <file>images/search.png</file>
+        <file>images/head_1.png</file>
+        <file>images/head_2.png</file>
+        <file>images/head_3.png</file>
+        <file>images/head_4.png</file>
+        <file>images/head_5.png</file>
+        <file>images/head_6.png</file>
+        <file>images/head_7.png</file>
+        <file>images/head_8.png</file>
+        <file>images/unvisible_press.png</file>
+        <file>images/visible_press.png</file>
+        <file>images/loading.gif</file>
     </qresource>
 </RCC>

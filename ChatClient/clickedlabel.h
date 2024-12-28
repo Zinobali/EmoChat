@@ -16,11 +16,14 @@ public:
     ClickLbState GetCurState() const;
     void SetState(QString normal = "", QString hover = "", QString press = "",
                   QString select = "", QString select_hover = "", QString select_press = "");
+    void ResetNormalState();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void enterEvent(QEvent *event) override;
     virtual void leaveEvent(QEvent *event) override;
+
 
 signals:
     void clicked();
@@ -33,7 +36,6 @@ private:
     QString _selected_hover;
     QString _selected_press;
     ClickLbState _curstate;
-
 };
 
 #endif // CLICKEDLABEL_H

@@ -40,10 +40,10 @@ void RegisterDialog::initUiDesign()
     ui->tip_label->setProperty("state", "normal");
     ui->tip_label->clear();
     repolish(ui->tip_label);
-    ui->pass_visible->SetState("unvisible", "unvisible_hover", "",
-                               "visible", "visible_hover", "");
-    ui->confirm_visible->SetState("unvisible", "unvisible_hover", "",
-                                  "visible", "visible_hover", "");
+    ui->pass_visible->SetState("unvisible", "unvisible_hover", "unvisible_press",
+                               "visible", "visible_hover", "visible_press");
+    ui->confirm_visible->SetState("unvisible", "unvisible_hover", "unvisible_press",
+                                  "visible", "visible_hover", "visible_press");
 }
 
 void RegisterDialog::initHttpHandlers()

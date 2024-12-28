@@ -67,7 +67,7 @@ void MainWindow::SlotSwitchChat()
     setCentralWidget(_chat_dlg);
     _chat_dlg->show();
     _login_dlg->hide();
-    setMinimumSize(QSize(1000, 650));
+    setMinimumSize(QSize(1050, 700));
     setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }
 
@@ -75,6 +75,6 @@ void MainWindow::test_function() // 测试函数，后续删除
 {
     _chat_dlg = new ChatDialog(this);
     setCentralWidget(_chat_dlg);
-    setMinimumSize(QSize(800, 650));
+    setMinimumSize(QSize(1050, 700));
     setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }

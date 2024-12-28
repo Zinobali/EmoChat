@@ -24,7 +24,7 @@ LoginDialog::~LoginDialog()
 void LoginDialog::initUiDesign()
 {
     setWindowFlags(Qt::CustomizeWindowHint|Qt::FramelessWindowHint); // 通过设置无边框窗口达到让dialog嵌入到主窗口的效果
-    ui->forget_label->SetState("normal","hover","","selected","selected_hover","");
+    ui->forget_label->SetState("normal","hover","press","selected","selected_hover","selected_press");
 }
 
 void LoginDialog::initUiSignals()
