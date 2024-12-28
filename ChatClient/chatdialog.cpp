@@ -6,8 +6,9 @@
 #include <QProgressBar>
 #include <QRandomGenerator>
 #include <QTimer>
-#include "chatuserwidget.h"
 #include <QDebug>
+#include <vector>
+
 
 ChatDialog::ChatDialog(QWidget *parent)
     : QDialog(parent)
@@ -64,18 +65,20 @@ void ChatDialog::initSignals()
 
 void ChatDialog::addChatUserList()
 {
-    for (int var = 0; var < 13; ++var) {
+    for (int var = 0; var < 20; ++var) {
         int rand_val = QRandomGenerator::global()->bounded(100);
         int str_i = rand_val % strs.size();
         int head_i = rand_val % heads.size();
         int name_i = rand_val % names.size();
 
-        auto* w = new ChatUserWidget();
-        w->SetInfo(names[name_i], heads[head_i], strs[str_i]);
-        auto* item = new QListWidgetItem();
-        item->setSizeHint(w->sizeHint());
-        ui->chatting_list->addItem(item);
-        ui->chatting_list->setItemWidget(item, w);
+        // 生成一年内的随机时间
+        QDateTime now = QDateTime::currentDateTime();
+        int randomDays = QRandomGenerator::global()->bounded(365);  // 随机0到364天
+        int randomSeconds = QRandomGenerator::global()->bounded(86400); // 随机一天中的秒数
+        QDateTime randomTime = now.addDays(-randomDays).addSecs(-randomSeconds);
+
+        auto* model = static_cast<ChatUserListModel*>(ui->chatting_list->model());
+        model->AddChatUser(names[name_i], heads[head_i], strs[str_i], randomTime);
     }
 }
 
@@ -84,35 +87,28 @@ void ChatDialog::slot_loading_chat_user()
     if (b_loading_) {
         return;
     }
+
+    qDebug() << "loading users ...";
     // 添加加载动画
     b_loading_ = true;
-    auto* loadingItem = new QListWidgetItem();
-    auto* loadingWidget = new QWidget();
-    auto* layout = new QVBoxLayout(loadingWidget);
-    auto* progressBar = new QProgressBar();
-    progressBar->setRange(0, 0); // 设置为无限加载模式
-    // auto* movie = new QMovie(":/images/loading.gif");
-    // auto* loadingLabel = new QLabel();
-    // loadingLabel->setMovie(movie);
-    // movie->setScaledSize(QSize(60, 60));
-    // movie->start();
-    layout->addWidget(progressBar);
-    loadingWidget->setLayout(layout);
 
-    // 添加动画到列表底部
-    loadingItem->setSizeHint(QSize(300, 80));
-    ui->chatting_list->addItem(loadingItem);
-    ui->chatting_list->setItemWidget(loadingItem, loadingWidget);
+    std::vector<ChatUser> users;
+    for (int var = 0; var < 5; ++var) {
+        int rand_val = QRandomGenerator::global()->bounded(100);
+        int str_i = rand_val % strs.size();
+        int head_i = rand_val % heads.size();
+        int name_i = rand_val % names.size();
+        ChatUser u;
+        u.name = names[name_i];
+        u.head = heads[head_i];
+        u.msg = strs[str_i];
+        u.lastMsgTime = QDateTime::currentDateTime();
+        users.push_back(u);
+    }
+    auto* model = static_cast<ChatUserListModel*>(ui->chatting_list->model());
+    model->AddChatUsers(users.cbegin(), users.cend());
 
-    // 模拟数据加载后移除动画
-    QTimer::singleShot(3000, this, [this, loadingItem]() {
-        // 添加用户
-        qDebug() << "Loading more users...";
-        addChatUserList();
-
-        delete loadingItem;
-        b_loading_ = false;
-    });
+    b_loading_ = false;
 }
 
 std::vector<QString> ChatDialog::strs = {

@@ -274,7 +274,14 @@
        </widget>
       </item>
       <item>
-       <widget class="ChatUserList" name="chatting_list"/>
+       <widget class="ChatUserList" name="chatting_list">
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="verticalScrollMode">
+         <enum>QAbstractItemView::ScrollPerPixel</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QListWidget" name="contacts_list"/>
@@ -300,15 +307,15 @@
    <header location="global">clickedbtn.h</header>
   </customwidget>
   <customwidget>
-   <class>ChatUserList</class>
-   <extends>QListWidget</extends>
-   <header location="global">chatuserlist.h</header>
-  </customwidget>
-  <customwidget>
    <class>ChatPage</class>
    <extends>QWidget</extends>
    <header location="global">chatpage.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChatUserList</class>
+   <extends>QListView</extends>
+   <header location="global">chatuserlist.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

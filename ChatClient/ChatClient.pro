@@ -14,8 +14,9 @@ DESTDIR = ./bin
 SOURCES += \
     chatdialog.cpp \
     chatpage.cpp \
+    chatuserdelegate.cpp \
     chatuserlist.cpp \
-    chatuserwidget.cpp \
+    chatuserlistmodel.cpp \
     clickedbtn.cpp \
     clickedlabel.cpp \
     global.cpp \
@@ -33,8 +34,9 @@ SOURCES += \
 HEADERS += \
     chatdialog.h \
     chatpage.h \
+    chatuserdelegate.h \
     chatuserlist.h \
-    chatuserwidget.h \
+    chatuserlistmodel.h \
     clickedbtn.h \
     clickedlabel.h \
     global.h \
@@ -52,7 +54,6 @@ HEADERS += \
 FORMS += \
     chatdialog.ui \
     chatpage.ui \
-    chatuserwidget.ui \
     logindialog.ui \
     mainwindow.ui \
     registerdialog.ui \
