@@ -5,6 +5,10 @@ VerifyServer/config.json
 
 # 忽略Debug文件夹
 build-ChatClient-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/
+debug/
+bin/
+release/
+.qmake.stash
 
 # 忽略编译输出
 x64/
@@ -22,3 +26,19 @@ node_modules/
 CommonLib/
 # 忽略TcpTestClient
 TcpTestClient/
+
+# 忽略vs2022的qt构建输出
+# 忽略自动生成的 UI 头文件
+ui_*.h
+
+# 忽略 ChatClient 项目中的特定文件和目录 
+ChatClient/bin/ 
+ChatClient/debug/ 
+ChatClient/release/ 
+ChatClient/.qmake.stash 
+ChatClient/ChatClient.pro.user
+ChatClient/ChatClient_resource.rc
+ChatClient/ChatClient.qtvscr
+ChatClient/ChatClient.sln
+ChatClient/ChatClient.vcxproj
+ChatClient/ChatClient.vcxproj.filters

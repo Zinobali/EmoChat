@@ -12,11 +12,14 @@ RC_ICONS = app.ico
 DESTDIR = ./bin
 
 SOURCES += \
+    bubbleframe.cpp \
     chatdialog.cpp \
+    chatitembase.cpp \
     chatpage.cpp \
     chatuserdelegate.cpp \
     chatuserlist.cpp \
     chatuserlistmodel.cpp \
+    chatview.cpp \
     clickedbtn.cpp \
     clickedlabel.cpp \
     global.cpp \
@@ -25,18 +28,24 @@ SOURCES += \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
+    msgtextedit.cpp \
+    picturebubble.cpp \
     registerdialog.cpp \
     resetdialog.cpp \
     tcpmgr.cpp \
+    textbubble.cpp \
     timerbtn.cpp \
     usermgr.cpp
 
 HEADERS += \
+    bubbleframe.h \
     chatdialog.h \
+    chatitembase.h \
     chatpage.h \
     chatuserdelegate.h \
     chatuserlist.h \
     chatuserlistmodel.h \
+    chatview.h \
     clickedbtn.h \
     clickedlabel.h \
     global.h \
@@ -44,16 +53,20 @@ HEADERS += \
     listitembase.h \
     logindialog.h \
     mainwindow.h \
+    msgtextedit.h \
+    picturebubble.h \
     registerdialog.h \
     resetdialog.h \
     singleton.h \
     tcpmgr.h \
+    textbubble.h \
     timerbtn.h \
     usermgr.h
 
 FORMS += \
     chatdialog.ui \
     chatpage.ui \
+    chatview.ui \
     logindialog.ui \
     mainwindow.ui \
     registerdialog.ui \
@@ -78,3 +91,6 @@ CONFIG(release, debug | release)
     //执行copy命令
     QMAKE_POST_LINK += copy /Y \"$$TargetConfig\" \"$$OutputDir\"
 }
+
+msvc:QMAKE_CXXFLAGS +=  -execution-charset:utf-8
+msvc:QMAKE_CXXFLAGS +=  -source-charset:utf-8
