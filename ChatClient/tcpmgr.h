@@ -14,6 +14,16 @@ struct ServerInfo{
     QString Token;
 };
 
+class SearchInfo {
+public:
+    SearchInfo(int uid, QString name, QString nick, QString desc, int sex);
+    int _uid;
+    QString _name;
+    QString _nick;
+    QString _desc;
+    int _sex;
+};
+
 typedef std::function<void(RequestId id, QByteArray data)> TcpHandler;
 class TcpMgr : public QObject, public Singleton<TcpMgr>,
                public std::enable_shared_from_this<TcpMgr>
@@ -49,6 +59,7 @@ signals:
     void sig_send_data(RequestId reqId, QString msg);
     void sig_login_failed(ErrorCodes err);
     void sig_switch_chatdlg();
+    void sig_user_search(std::shared_ptr<SearchInfo>);
 };
 
 #endif // TCPMGR_H

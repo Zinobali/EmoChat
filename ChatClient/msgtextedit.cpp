@@ -140,8 +140,8 @@ void MsgTextEdit::insertTextFile(const QString &url)
     }
 
     QPixmap pix = getFileIconPixmap(url);
-    QTextCursor cursor = this->textCursor();
-    cursor.insertImage(pix.toImage(), url);
+    QTextCursor cursor = this->textCursor(); // 获取光标
+    cursor.insertImage(pix.toImage(), url);  // 插入图片到光标位置
     insertMsgList(msgList_, MsgType::File, url, pix);
 }
 
@@ -207,24 +207,23 @@ QPixmap MsgTextEdit::getFileIconPixmap(const QString &url)
     QIcon icon = provder.icon(fileinfo);
 
     QString strFileSize = getFileSize(fileinfo.size());
-    // qDebug() << "FileSize=" << fileinfo.size();
 
-    QFont font(QString("宋体"), 10, QFont::Normal, false);
+    QFont font("Microsoft YaHei", 10, QFont::Normal);
     QFontMetrics fontMetrics(font);
     QSize textSize = fontMetrics.size(Qt::TextSingleLine, fileinfo.fileName());
 
     QSize FileSize = fontMetrics.size(Qt::TextSingleLine, strFileSize);
-    int maxWidth = textSize.width() > FileSize.width() ? textSize.width() : FileSize.width();
+    int maxWidth = std::max(textSize.width(), FileSize.width());
     QPixmap pix(50 + maxWidth + 10, 50);
     pix.fill();
 
     QPainter painter;
-    // painter.setRenderHint(QPainter::Antialiasing, true);
-    // painter.setFont(font);
     painter.begin(&pix);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setFont(font);
     // 文件图标
-    QRect rect(0, 0, 50, 50);
-    painter.drawPixmap(rect, icon.pixmap(40, 40));
+    QRect rectIcon(0, 0, 50, 50);
+    painter.drawPixmap(rectIcon, icon.pixmap(40, 40));
     painter.setPen(Qt::black);
     // 文件名称
     QRect rectText(50 + 10, 3, textSize.width(), textSize.height());

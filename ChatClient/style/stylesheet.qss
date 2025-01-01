@@ -290,3 +290,99 @@ QScrollBar::sub-page:vertical {
     background: transparent;
     border: none;
 }
+
+/* 聊天主窗口侧边栏 */
+#side_chat_lb[state='normal'] {
+    border-image: url(:/images/chat_icon.png);
+}
+
+#side_chat_lb[state='hover'] {
+    border-image: url(:/images/chat_icon_hover.png);
+}
+
+#side_chat_lb[state='pressed'] {
+    border-image: url(:/images/chat_icon_press.png);
+}
+
+#side_chat_lb[state='selected_normal'] {
+    border-image: url(:/images/chat_icon_press.png);
+}
+
+#side_chat_lb[state='selected_hover'] {
+    border-image: url(:/images/chat_icon_press.png);
+}
+
+#side_chat_lb[state='selected_pressed'] {
+    border-image: url(:/images/chat_icon_press.png);
+}
+
+#side_contacts_lb[state='normal'] {
+    border-image: url(:/images/contact_list.png);
+}
+
+#side_contacts_lb[state='hover'] {
+    border-image: url(:/images/contact_list_hover.png);
+}
+
+#side_contacts_lb[state='pressed'] {
+    border-image: url(:/images/contact_list_press.png);
+}
+
+#side_contacts_lb[state='selected_normal'] {
+    border-image: url(:/images/contact_list_press.png);
+}
+
+#side_contacts_lb[state='selected_hover'] {
+    border-image: url(:/images/contact_list_press.png);
+}
+
+#side_contacts_lb[state='selected_pressed'] {
+    border-image: url(:/images/contact_list_press.png);
+}
+
+/* 搜索列表 */
+#search_edit {
+    border: 2px solid #f1f1f1;
+}
+
+/* 搜索框列表*/
+#search_list {
+    background-color: rgb(247, 247, 248);
+    border: none;
+}
+
+#search_list::item:selected {
+    background-color: #d3d7d4;
+    border: none;
+    outline: none;
+}
+
+#search_list::item:hover {
+    background-color: rgb(206, 207, 208);
+    border: none;
+    outline: none;
+}
+
+#search_list::focus {
+    border: none;
+    outline: none;
+}
+
+#invalid_item {
+    background-color: #eaeaea;
+    border: none;
+}
+
+#add_tip {
+    border-image: url(:/images/addtip.png);
+}
+
+#right_tip {
+    border-image: url(:/images/right_tip.png);
+}
+
+#message_tip {
+    text-align: center;
+    font-family: "Microsoft YaHei";
+    font-size: 12pt;
+}
