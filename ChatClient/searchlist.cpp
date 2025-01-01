@@ -4,6 +4,7 @@
 #include <QEvent>
 #include <QWheelEvent>
 #include <QScrollBar>
+#include "findsuccessdlg.h"
 
 SearchList::SearchList(QWidget *parent)
     : QListWidget(parent), _send_pending(false), _search_edit(nullptr), _find_dlg(nullptr)
@@ -90,6 +91,42 @@ void SearchList::initTipItem()
 
 void SearchList::slot_item_clicked(QListWidgetItem *item)
 {
+    QWidget *widget = this->itemWidget(item); // 获取自定义widget对象
+    if (!widget)
+    {
+        qDebug() << "widget is null";
+        return;
+    }
+
+    ListItemBase *customItem = dynamic_cast<ListItemBase *>(widget);
+    if (!customItem)
+    {
+        qDebug() << "customItem is null";
+        return;
+    }
+
+    auto item_type = customItem->item_type();
+    if (item_type == ListItemType::INVALID_ITEM)
+    {
+        qDebug() << "slot invalid item clicked ";
+        return;
+    }
+
+    if (item_type == ListItemType::ADD_USER_TIP_ITEM)
+    {
+        qDebug() << "slot add user item clicked ";
+        _find_dlg = std::make_shared<FindSuccessDlg>();
+        auto info = std::make_shared<SearchInfo>(0, "zinobali", "zinobali", "hello, amigo!", 0);
+        auto dlg = std::dynamic_pointer_cast<FindSuccessDlg>(_find_dlg);
+        if (dlg)
+        {
+            dlg->SetSearchInfo(info);
+            dlg->show();
+        }
+
+        return;
+    }
+    qDebug() << "slot user item clicked but unknown item type";
 }
 
 void SearchList::slot_user_search(std::shared_ptr<SearchInfo> si)

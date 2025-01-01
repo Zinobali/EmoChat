@@ -7,16 +7,21 @@
 #include "global.h"
 #include <functional>
 
-struct ServerInfo{
+struct ServerInfo
+{
     int Uid;
     QString Host;
     QString Port;
     QString Token;
 };
 
-class SearchInfo {
+class SearchInfo
+{
 public:
-    SearchInfo(int uid, QString name, QString nick, QString desc, int sex);
+    SearchInfo(int uid, QString name, QString nick, QString desc, int sex)
+        : _uid(uid), _name(name), _nick(nick), _desc(desc), _sex(sex)
+    {
+    }
     int _uid;
     QString _name;
     QString _nick;
@@ -25,13 +30,12 @@ public:
 };
 
 typedef std::function<void(RequestId id, QByteArray data)> TcpHandler;
-class TcpMgr : public QObject, public Singleton<TcpMgr>,
-               public std::enable_shared_from_this<TcpMgr>
+class TcpMgr : public QObject, public Singleton<TcpMgr>, public std::enable_shared_from_this<TcpMgr>
 {
     Q_OBJECT
     friend class Singleton<TcpMgr>;
-public:
 
+public:
 private:
     explicit TcpMgr(QObject *parent = nullptr);
     void initSignals();

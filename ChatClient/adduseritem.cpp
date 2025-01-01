@@ -2,11 +2,10 @@
 #include "ui_adduseritem.h"
 
 AddUserItem::AddUserItem(QWidget *parent)
-    : ListItemBase(parent)
-    , ui(new Ui::AddUserItem)
+    : ListItemBase(parent), ui(new Ui::AddUserItem)
 {
     ui->setupUi(this);
-    setItem_type(ListItemType::SEARCH_USER_ITEM);
+    setItem_type(ListItemType::ADD_USER_TIP_ITEM);
 }
 
 AddUserItem::~AddUserItem()
