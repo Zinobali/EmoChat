@@ -27,12 +27,16 @@ public:
     void ShowSearch(bool show);
     void AddLabelGroup(StateWidget *label);
 
+protected:
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     void initUI();
     void initSignals();
     void addChatUserList();
     void setSideBarUserHead(const QString &headUrl);
     void clearOtherLabelState(StateWidget *w);
+    void handleGlobalMousePress(QMouseEvent *event);
 
 private slots:
     void slot_loading_chat_user();

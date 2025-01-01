@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <vector>
 #include <QVBoxLayout>
+#include <QMouseEvent>
 
 ChatDialog::ChatDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::ChatDialog), mode_(ChatUIMode::ChatMode), state_(ChatUIMode::ChatMode),
@@ -54,10 +55,22 @@ void ChatDialog::AddLabelGroup(StateWidget *label)
     label_list_.push_back(label);
 }
 
+bool ChatDialog::eventFilter(QObject *watched, QEvent *event)
+{
+    if (ChatUIMode::SearchMode == mode_)
+    {
+        if (event->type() == QEvent::MouseButtonPress)
+        {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            handleGlobalMousePress(mouseEvent);
+        }
+    }
+
+    return QDialog::eventFilter(watched, event);
+}
+
 void ChatDialog::initUI()
 {
-    // auto* v_layout1 = static_cast<QVBoxLayout*>(ui->state_group->layout());
-    // v_layout1->setAlignment(Qt::AlignVCenter);
     setWindowFlags(Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
     ui->add_btn->SetState("normal", "hover", "press"); // 必须显式的设置状态，管理qss
     // 搜索框搜索图标
@@ -77,6 +90,9 @@ void ChatDialog::initUI()
     // 直接显示聊天页面
     ui->side_chat_lb->SetSelected(true);
     // slot_side_chat_clicked();
+    // 显示一个红点（测试用）
+    ui->side_chat_lb->ShowRedPoint(true);
+    installEventFilter(this);
 }
 
 void ChatDialog::initSignals()
@@ -124,6 +140,17 @@ void ChatDialog::clearOtherLabelState(StateWidget *w)
             continue;
         }
         label->ClearState();
+    }
+}
+
+void ChatDialog::handleGlobalMousePress(QMouseEvent *event)
+{
+    QPoint pos = ui->search_list->mapFromGlobal(event->globalPos());
+    bool contains = ui->search_list->rect().contains(pos);
+    if (!contains)
+    {
+        ui->search_edit->clear();
+        ShowSearch(false);
     }
 }
 
