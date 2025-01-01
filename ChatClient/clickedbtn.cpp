@@ -5,6 +5,7 @@
 ClickedBtn::ClickedBtn(QWidget *parent)
     : QPushButton(parent)
 {
+    setFocusPolicy(Qt::NoFocus); // 不设置为无焦点，回车键会触发按钮
 }
 
 void ClickedBtn::SetState(QString nomal, QString hover, QString press)
