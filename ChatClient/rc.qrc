@@ -37,5 +37,8 @@
         <file>images/contact_list_press.png</file>
         <file>images/addtip.png</file>
         <file>images/right_tip.png</file>
+        <file>images/arowdown.png</file>
+        <file>images/red_point.png</file>
+        <file>images/tipclose.png</file>
     </qresource>
 </RCC>

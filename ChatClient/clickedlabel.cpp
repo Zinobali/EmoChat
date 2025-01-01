@@ -6,6 +6,21 @@
 ClickedLabel::ClickedLabel(QWidget *parent)
     : QLabel(parent), _curstate(ClickLbState::Normal) {}
 
+void ClickedLabel::SetCurState(ClickLbState state)
+{
+    _curstate = state;
+    if (_curstate == ClickLbState::Normal)
+    {
+        setProperty("state", _normal);
+        repolish(this);
+    }
+    else if (_curstate == ClickLbState::Selected)
+    {
+        setProperty("state", _selected);
+        repolish(this);
+    }
+}
+
 ClickLbState ClickedLabel::GetCurState() const
 {
     return _curstate;
@@ -68,7 +83,7 @@ void ClickedLabel::mouseReleaseEvent(QMouseEvent *event)
             setProperty("state", _normal_hover);
             qDebug() << "LeftButton clicked: " << _normal_hover;
         }
-        emit clicked();
+        emit clicked(this->text(), _curstate);
         repolish(this);
         return;
     }

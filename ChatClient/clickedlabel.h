@@ -3,7 +3,8 @@
 
 #include <QLabel>
 
-enum class ClickLbState {
+enum class ClickLbState
+{
     Normal = 0,
     Selected = 1
 };
@@ -12,7 +13,8 @@ class ClickedLabel : public QLabel
 {
     Q_OBJECT
 public:
-    ClickedLabel(QWidget *parent=nullptr);
+    ClickedLabel(QWidget *parent = nullptr);
+    void SetCurState(ClickLbState state);
     ClickLbState GetCurState() const;
     void SetState(QString normal = "", QString hover = "", QString press = "",
                   QString select = "", QString select_hover = "", QString select_press = "");
@@ -24,9 +26,8 @@ protected:
     virtual void enterEvent(QEvent *event) override;
     virtual void leaveEvent(QEvent *event) override;
 
-
 signals:
-    void clicked();
+    void clicked(QString, ClickLbState);
 
 private:
     QString _normal;
