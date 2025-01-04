@@ -25,10 +25,13 @@ SOURCES += \
     clickedbtn.cpp \
     clickedlabel.cpp \
     clickedoncelabel.cpp \
+    contactslist.cpp \
+    conuseritem.cpp \
     customizeedit.cpp \
     findsuccessdlg.cpp \
     friendlabel.cpp \
     global.cpp \
+    grouptipitem.cpp \
     httpmgr.cpp \
     listitembase.cpp \
     logindialog.cpp \
@@ -43,6 +46,7 @@ SOURCES += \
     tcpmgr.cpp \
     textbubble.cpp \
     timerbtn.cpp \
+    userdata.cpp \
     usermgr.cpp
 
 HEADERS += \
@@ -59,10 +63,13 @@ HEADERS += \
     clickedbtn.h \
     clickedlabel.h \
     clickedoncelabel.h \
+    contactslist.h \
+    conuseritem.h \
     customizeedit.h \
     findsuccessdlg.h \
     friendlabel.h \
     global.h \
+    grouptipitem.h \
     httpmgr.h \
     listitembase.h \
     logindialog.h \
@@ -77,6 +84,7 @@ HEADERS += \
     tcpmgr.h \
     textbubble.h \
     timerbtn.h \
+    userdata.h \
     usermgr.h
 
 FORMS += \
@@ -85,8 +93,10 @@ FORMS += \
     chatdialog.ui \
     chatpage.ui \
     chatview.ui \
+    conuseritem.ui \
     findsuccessdlg.ui \
     friendlabel.ui \
+    grouptipitem.ui \
     logindialog.ui \
     mainwindow.ui \
     registerdialog.ui \

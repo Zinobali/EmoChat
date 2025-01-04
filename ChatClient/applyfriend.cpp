@@ -199,6 +199,66 @@ void ApplyFriend::addLabel(const QString &name)
     }
 }
 
+ClickedLabel *ApplyFriend::createLabel(const QString &text, QPoint &cur_point, QPoint &next_point, QWidget *parent, int &lines, int max_lines)
+{
+    // 创建标签
+    auto *lb = new ClickedLabel(parent);
+    lb->SetState("normal", "hover", "pressed",
+                 "selected_normal", "selected_hover", "selected_pressed");
+    lb->setObjectName("tipslb");
+    lb->setText(text);
+    // 获取标签的宽度和高度
+    QFontMetrics fontMetrics(lb->font());
+    int textWidth = fontMetrics.horizontalAdvance(lb->text());
+    int textHeight = fontMetrics.height();
+    // 设置标签的位置
+    if (cur_point.x() + textWidth + tip_offset > parent->width())
+    {
+        cur_point.setX(tip_offset);
+        cur_point.setY(cur_point.y() + textHeight + 15);
+        lines++; // 增加行数
+    }
+
+    // 超过最大行数则不展示
+    if (lines > max_lines)
+    {
+        delete lb; // 删除多余的标签
+        return nullptr;
+    }
+
+    AddTipLbs(lb, cur_point, next_point, textWidth, textHeight);
+    return lb;
+}
+
+void ApplyFriend::addOrUpdateLabel(const QString &text, QWidget *parent, bool selectState)
+{
+    // 查找是否已存在标签
+    auto find_it = _add_labels.find(text);
+    if (find_it != _add_labels.end())
+    {
+        if (selectState)
+        {
+            find_it.value()->SetCurState(ClickLbState::Selected);
+        }
+        else
+        {
+            find_it.value()->ResetNormalState();
+        }
+        return;
+    }
+
+    // 不存在则新增标签
+    int fake_line = 2; //此功能还未设计完毕，预留接口，勿用
+    auto *lb = createLabel(text, _tip_cur_point, _tip_cur_point, parent, fake_line);
+    _add_labels[text] = lb;
+    _add_label_keys.push_back(text);
+
+    if (selectState)
+    {
+        lb->SetCurState(ClickLbState::Selected);
+    }
+}
+
 void ApplyFriend::ShowMoreLabel()
 {
     ui->more_lb_wid->hide();

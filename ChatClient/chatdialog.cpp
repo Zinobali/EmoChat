@@ -4,12 +4,12 @@
 #include <QElapsedTimer>
 #include <QMovie>
 #include <QProgressBar>
-#include <QRandomGenerator>
 #include <QTimer>
 #include <QDebug>
 #include <vector>
 #include <QVBoxLayout>
 #include <QMouseEvent>
+#include "global.h"
 
 ChatDialog::ChatDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::ChatDialog), mode_(ChatUIMode::ChatMode), state_(ChatUIMode::ChatMode),
@@ -77,6 +77,7 @@ void ChatDialog::initUI()
     QAction *searchAction = new QAction(ui->search_edit);
     searchAction->setIcon(QIcon(":/images/search.png"));
     ui->search_edit->addAction(searchAction, QLineEdit::LeadingPosition);
+    ui->search_edit->setPlaceholderText(tr("搜索"));
     // list模式
     ShowSearch(false);
     // 添加模拟聊天列表
@@ -226,30 +227,3 @@ void ChatDialog::slot_side_contact_clicked()
     state_ = ChatUIMode::ContactMode;
     ShowSearch(false);
 }
-
-std::vector<QString> ChatDialog::strs = {
-    "hello world !",
-    "nice to meet u",
-    "New year，new life",
-    "You have to love yourself",
-    "My love is written in the wind ever since the whole world is you"};
-
-std::vector<QString> ChatDialog::heads = {
-    ":/images/head_1.png",
-    ":/images/head_2.png",
-    ":/images/head_3.png",
-    ":/images/head_4.png",
-    ":/images/head_5.png",
-    ":/images/head_6.png",
-    ":/images/head_7.png",
-    ":/images/head_8.png"};
-
-std::vector<QString> ChatDialog::names = {
-    "llfc",
-    "zack",
-    "golang",
-    "cpp",
-    "java",
-    "nodejs",
-    "python",
-    "rust"};

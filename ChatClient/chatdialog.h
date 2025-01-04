@@ -52,10 +52,6 @@ private:
     bool b_loading_;
     QList<StateWidget *> label_list_;
     QWidget *last_widget_;
-
-    static std::vector<QString> strs;
-    static std::vector<QString> heads;
-    static std::vector<QString> names;
 };
 
 #endif // CHATDIALOG_H

@@ -404,7 +404,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="contacts_list"/>
+       <widget class="ContactsList" name="contacts_list"/>
       </item>
       <item>
        <widget class="SearchList" name="search_list"/>
@@ -461,6 +461,11 @@
    <class>SearchList</class>
    <extends>QListWidget</extends>
    <header location="global">searchlist.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ContactsList</class>
+   <extends>QListWidget</extends>
+   <header location="global">contactslist.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

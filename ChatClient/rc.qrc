@@ -40,5 +40,6 @@
         <file>images/arowdown.png</file>
         <file>images/red_point.png</file>
         <file>images/tipclose.png</file>
+        <file>images/add_friend.png</file>
     </qresource>
 </RCC>

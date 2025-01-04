@@ -539,12 +539,12 @@
   <customwidget>
    <class>CustomizeEdit</class>
    <extends>QLineEdit</extends>
-   <header>customizeedit.h</header>
+   <header location="global">customizeedit.h</header>
   </customwidget>
   <customwidget>
    <class>ClickedOnceLabel</class>
    <extends>QLabel</extends>
-   <header>clickedoncelabel.h</header>
+   <header location="global">clickedoncelabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

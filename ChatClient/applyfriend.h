@@ -8,7 +8,7 @@
 
 constexpr int tip_offset = 5;
 const QString add_prefix = "添加标签 ";
-//申请好友标签输入框最低长度
+// 申请好友标签输入框最低长度
 constexpr int MIN_APPLY_LABEL_ED_LEN = 40;
 
 namespace Ui
@@ -34,6 +34,8 @@ private:
     void initSignals();
     void resetLabels();
     void addLabel(const QString &name);
+    ClickedLabel *createLabel(const QString &text, QPoint &cur_point, QPoint &next_point, QWidget *parent, int &lines, int max_lines = 2);
+    void addOrUpdateLabel(const QString &text, QWidget *parent, bool selectState);
 
 private:
     Ui::ApplyFriend *ui;
