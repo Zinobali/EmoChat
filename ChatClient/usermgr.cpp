@@ -13,6 +13,26 @@ void UserMgr::test_function() // 测试函数，后续删除
     name_ = "旻山君";
 }
 
+std::vector<std::shared_ptr<ApplyInfo> > UserMgr::apply_list() const
+{
+    return apply_list_;
+}
+
+void UserMgr::setApply_list(const std::vector<std::shared_ptr<ApplyInfo> > &newApply_list)
+{
+    apply_list_ = newApply_list;
+}
+
+std::vector<std::shared_ptr<FriendInfo> > UserMgr::friend_list() const
+{
+    return friend_list_;
+}
+
+void UserMgr::setFriend_list(const std::vector<std::shared_ptr<FriendInfo> > &newFriend_list)
+{
+    friend_list_ = newFriend_list;
+}
+
 UserMgr::~UserMgr()
 {
     qDebug() << "~UserMgr()";

@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include "global.h"
 #include <functional>
+#include "userdata.h"
 
 struct ServerInfo
 {
@@ -64,6 +65,7 @@ signals:
     void sig_login_failed(ErrorCodes err);
     void sig_switch_chatdlg();
     void sig_user_search(std::shared_ptr<SearchInfo>);
+    void sig_auth_rsp(std::shared_ptr<AuthRsp>);
 };
 
 #endif // TCPMGR_H

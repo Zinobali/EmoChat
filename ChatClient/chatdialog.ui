@@ -415,21 +415,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <widget class="ChatPage" name="chat_page"/>
-     <widget class="QWidget" name="friend_apply_page">
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>260</y>
-         <width>53</width>
-         <height>15</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-     </widget>
+     <widget class="ApplyFriendPage" name="friend_apply_page"/>
     </widget>
    </item>
   </layout>
@@ -466,6 +452,12 @@
    <class>ContactsList</class>
    <extends>QListWidget</extends>
    <header location="global">contactslist.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ApplyFriendPage</class>
+   <extends>QWidget</extends>
+   <header location="global">applyfriendpage.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
