@@ -5,6 +5,10 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/functional/hash.hpp>
 #include "global.h"
+#include <boost/uuid/detail/md5.hpp>
+#include <sstream>
+#include <iomanip>
+#include <chrono>
 
 MySQLConnectionPool::MySQLConnectionPool(const std::string& host, const unsigned int port, const std::string& user, const std::string& pwd, size_t pool_size)
     :pool_size_(pool_size), b_stop_(false),
@@ -41,8 +45,7 @@ void MySQLConnectionPool::Close() {
 mysqlx::Session MySQLConnectionPool::createConnection() {
     try {
         return Session(settings_);
-    }
-    catch (const mysqlx::Error& err) {
+    } catch (const mysqlx::Error& err) {
         std::cerr << "Error creating MySQL connection: " << err.what() << std::endl;
         throw std::runtime_error("Failed to create MySQL connection");
     }
@@ -63,7 +66,7 @@ int MySQLDao::RegisterUser(const std::string& name, const std::string& email, co
     Defer defer([&]() { pool_->releaseConnection(conn); });
     if (!conn) {
         std::cerr << "Failed to get a database connection." << std::endl;
-        return 0;
+        return -1;
     }
 
     try {
@@ -73,10 +76,13 @@ int MySQLDao::RegisterUser(const std::string& name, const std::string& email, co
         // 加密密码
         auto h_pwd = HashPassword(pwd, salt);
         std::cout << "加密后的密码为: " << h_pwd << std::endl;
+        auto uid = generateUid(email);
+        std::cout << "生成的UID为: " << uid << std::endl;
         // 选择数据库
         conn->sql("USE " + schema_).execute();
         // 调用存储过程
-        auto result = conn->sql("CALL reg_user(?, ?, ?, ?, @result)").bind(name, email, h_pwd, salt).execute();
+        auto result = conn->sql("CALL reg_user(?, ?, ?, ?, ?, @result)").bind(uid, name, email, h_pwd, salt).execute();
+
         // 获取存储过程返回值
         auto out_result = conn->sql("SELECT @result").execute().fetchOne();
         if (!out_result) {
@@ -85,9 +91,8 @@ int MySQLDao::RegisterUser(const std::string& name, const std::string& email, co
         int result_value = out_result[0];
         std::cout << "Result: " << result_value << std::endl;
         return result_value;
-    }
-    catch (const mysqlx::Error& err) {
-        std::cerr << "Error executing query: " << err.what() << std::endl;
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error in MySQLDao::RegisterUser executing query: " << err.what() << std::endl;
         return -1;
     }
 }
@@ -108,8 +113,67 @@ bool MySQLDao::VerifyPassword(const std::string& pwd, const std::string& salt, c
     return HashPassword(pwd, salt) == hash;
 }
 
+int MySQLDao::hashEmail(const std::string& email) {
+    // 生成时间戳
+    auto now = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    auto timestamp = duration.count();
+
+    std::ostringstream inputStream;
+    inputStream << email << timestamp << rand();
+    auto combinedInput = inputStream.str();
+
+    // 计算哈希值
+    boost::uuids::detail::md5 hash;
+    hash.process_bytes(combinedInput.c_str(), combinedInput.size());
+
+    boost::uuids::detail::md5::digest_type digest;
+    hash.get_digest(digest);
+
+    // 将哈希值转换为十六进制字符串
+    std::ostringstream oss;
+    for (int i = 0; i < 4; ++i) {
+        oss << std::hex << std::setw(8) << std::setfill('0') << digest[i]; // 将四个字节转换为十六进制字符串
+    }
+    std::string hashStr = oss.str();
+    // 取前8位作为UID
+    std::string uidStr = hashStr.substr(0, 8);
+
+    int uid;
+    std::stringstream(uidStr) >> std::hex >> uid;
+    uid %= 100000000;
+    return uid;
+}
+
+int MySQLDao::generateUid(const std::string& email) {
+    auto uid = hashEmail(email);
+    while (isUidExist(uid)) {
+        uid = hashEmail(email);
+    }
+    return uid;
+}
+
+bool MySQLDao::isUidExist(int uid) {
+    auto conn = pool_->getConnection();
+    Defer defer([&]() { pool_->releaseConnection(conn); });
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+
+    try {
+        auto table = conn->getSchema(schema_).getTable("user");
+        auto res = table.select("uid").where("uid = :param1").bind("param1", uid).execute().fetchOne();
+        // 检查查询结果是否有效，返回 true 表示 uid 存在
+        return res && !res.isNull();
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query: " << err.what() << std::endl;
+        return false;
+    }
+}
+
 bool MySQLDao::CheckEmail(const std::string& name, const std::string& email) {
-    //todo
+    //todo...
     return false;
 }
 
@@ -129,8 +193,7 @@ bool MySQLDao::UpdatePwd(const std::string& email, const std::string& pwd) {
         auto users = conn->getSchema(schema_).getTable("user");
         auto res = users.update().set("hashed_password", h_pwd).set("salt", salt).where("email = :param1").bind("param1", email).execute();
         return res.getAffectedItemsCount() > 0;
-    }
-    catch (const mysqlx::Error& err) {
+    } catch (const mysqlx::Error& err) {
         std::cerr << "Error executing query: " << err.what() << std::endl;
         return false;
     }
@@ -153,8 +216,7 @@ bool MySQLDao::EmailExist(const std::string& email) {
             .execute()
             .fetchOne();
         return !res.isNull();
-    }
-    catch (const mysqlx::Error& err) {
+    } catch (const mysqlx::Error& err) {
         std::cerr << "Error executing query: " << err.what() << std::endl;
         return false;
     }
@@ -197,8 +259,7 @@ bool MySQLDao::CheckPwd(const std::string& email, const std::string& pwd, UserIn
         user_info.hashed = hashed;
         user_info.salt = salt;
         return true;
-    }
-    catch (const mysqlx::Error& err) {
+    } catch (const mysqlx::Error& err) {
         std::cerr << "Error executing query: " << err.what() << std::endl;
         return false;
     }

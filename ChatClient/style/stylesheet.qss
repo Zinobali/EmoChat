@@ -647,6 +647,30 @@ QScrollBar::sub-page:vertical {
 }
 
 /* 好友申请界面 */
+#LineItem {
+    background-color: rgb(247, 247, 247);
+    border: none;
+}
+
+#friend_apply_lb {
+    font-family: "Microsoft YaHei";
+    font-size: 18px;
+    font-weight: normal;
+}
+
+#friend_apply_wid {
+    background-color: #f1f2f3;
+    border-bottom: 1px solid #ede9e7;
+}
+
+#apply_friend_list {
+    background-color: #f1f2f3;
+    border-left: 1px solid #ede9e7;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+}
+
 ApplyFriendItem {
     background-color: #f1f2f3;
     border-bottom: 2px solid #dbd9d9;

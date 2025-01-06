@@ -50,7 +50,9 @@ private:
     std::string GenerateSalt(); // 生成盐
     std::string HashPassword(const std::string& pwd, const std::string& salt); // 哈希密码
     bool VerifyPassword(const std::string& pwd, const std::string& salt, const std::string& hash); // 验证密码
-
+    int hashEmail(const std::string& email);
+    int generateUid(const std::string& email); // 生成uid
+    bool isUidExist(int uid);
     std::unique_ptr<MySQLConnectionPool> pool_;
     std::string schema_;
 

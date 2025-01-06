@@ -40,6 +40,7 @@ void LogicSystem::RegisterPostHandler(std::string url, HttpHandler handler) {
 }
 
 void LogicSystem::InitGetHandlers() {
+    // get测试请求
     RegisterGetHandler("/get_test", [](std::shared_ptr<HttpConnection> connection) {
         beast::ostream(connection->response_.body()) << "receive get_test req" << std::endl;
         int i = 0;
@@ -52,6 +53,7 @@ void LogicSystem::InitGetHandlers() {
 }
 
 void LogicSystem::InitPostHandlers() {
+    // 获取验证码
     RegisterPostHandler("/get_verifycode", [](std::shared_ptr<HttpConnection> connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         std::cout << "receive body is " << body_str << std::endl;
@@ -79,7 +81,7 @@ void LogicSystem::InitPostHandlers() {
         beast::ostream(connection->response_.body()) << json_str;
         return true;
         });
-
+    // 用户注册
     RegisterPostHandler("/user_register", [](std::shared_ptr< HttpConnection > connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         std::cout << "receive body is " << body_str << std::endl;
@@ -107,7 +109,7 @@ void LogicSystem::InitPostHandlers() {
             return true;
         }
 
-        // 从redis获取验证码
+        // 从redis查询验证码
         std::string verify_code;
         bool b_get_verify = RedisMgr::GetInstance().Get(CODEPREFIX + src_root["email"].asString(), verify_code);
         if (!b_get_verify) {
@@ -153,6 +155,7 @@ void LogicSystem::InitPostHandlers() {
         return true;
         });
 
+    // 重置密码
     RegisterPostHandler("/reset_pwd", [](std::shared_ptr<HttpConnection> connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         std::cout << "receive body is " << body_str << std::endl;
@@ -211,6 +214,7 @@ void LogicSystem::InitPostHandlers() {
         return true;
         });
 
+    // 用户登录
     RegisterPostHandler("/user_login", [](std::shared_ptr<HttpConnection> connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         std::cout << "receive body is " << body_str << std::endl;

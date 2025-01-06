@@ -16,3 +16,13 @@ message LoginRsp {
 service StatusService {
     rpc Login (LoginReq) returns (LoginRsp);
 }
+
+message AddFriendReq{
+    int32  applyuid = 1;
+	string name = 2;
+	string desc = 3;
+	string icon = 4;
+	string nick = 5;
+	int32  sex = 6;
+	int32  touid = 7;
+}
