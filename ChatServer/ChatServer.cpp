@@ -14,7 +14,7 @@ void RunServer() {
 
     // 启动grpc服务器
     auto grpc_server_host = config["SelfServer"]["Host"];
-    auto grpc_server_port = config["SelfServer"]["Port"];
+    auto grpc_server_port = config["SelfServer"]["RPCPort"];
     auto grpc_server_address = grpc_server_host + ":" + grpc_server_port;
     ChatServiceImpl service;
     ServerBuilder builder;

@@ -16,20 +16,6 @@ struct ServerInfo
     QString Token;
 };
 
-class SearchInfo
-{
-public:
-    SearchInfo(int uid, QString name, QString nick, QString desc, int sex)
-        : _uid(uid), _name(name), _nick(nick), _desc(desc), _sex(sex)
-    {
-    }
-    int _uid;
-    QString _name;
-    QString _nick;
-    QString _desc;
-    int _sex;
-};
-
 typedef std::function<void(RequestId id, QByteArray data)> TcpHandler;
 class TcpMgr : public QObject, public Singleton<TcpMgr>, public std::enable_shared_from_this<TcpMgr>
 {
@@ -40,10 +26,11 @@ public:
 private:
     explicit TcpMgr(QObject *parent = nullptr);
     void initSignals();
-    void initHttpHandlers();
+    void initHandlers();
     void handleRead();
     void handleChatLoginRsp(RequestId id, QByteArray data);
     void handleMsg(RequestId id, QByteArray data);
+    void handleSearchUserRsp(RequestId id, QByteArray data);
 
 private:
     QTcpSocket socket_;
@@ -57,11 +44,11 @@ private:
 
 public slots:
     void slot_tcp_connect(ServerInfo);
-    void slot_send_data(RequestId reqId, QString msg);
+    void slot_send_data(RequestId reqId, QByteArray dataBytes);
 
 signals:
     void sig_con_success(bool ok);
-    void sig_send_data(RequestId reqId, QString msg);
+    void sig_send_data(RequestId reqId, QByteArray dataBytes);
     void sig_login_failed(ErrorCodes err);
     void sig_switch_chatdlg();
     void sig_user_search(std::shared_ptr<SearchInfo>);

@@ -3,7 +3,7 @@
 
 struct UserInfo
 {
-    UserInfo() : name(""), hashed(""), salt(""), uid(0), email(""), nick(""), desc(""), sex(0), icon(""), back("") {}
+    UserInfo() : name(""), hashed(""), salt(""), uid(0), email(""), nick(""), desc(""), sex(0), icon("") {}
     int uid;
     std::string name;
     std::string hashed;
@@ -13,7 +13,6 @@ struct UserInfo
     std::string desc;
     int sex;
     std::string icon;
-    std::string back;
 };
 
 struct ApplyInfo

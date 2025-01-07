@@ -52,7 +52,6 @@ StatusServiceImpl::StatusServiceImpl() {
 }
 
 Status StatusServiceImpl::GetChatServer(ServerContext* context, const GetChatServerReq* request, GetChatServerRsp* response) {
-    std::string prefix("status server has received: ");
     auto s = getChatServer();
 
     response->set_host(s->host_);

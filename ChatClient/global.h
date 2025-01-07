@@ -53,7 +53,7 @@ private:
     std::function<void()> func_;
 };
 
-enum class RequestId
+enum RequestId
 {
     ID_GET_VERIFY_CODE = 1001,          // 获取验证码
     ID_REG_USER = 1002,                 // 注册用户
@@ -74,21 +74,21 @@ enum class RequestId
     ID_NOTIFY_TEXT_CHAT_MSG_REQ = 1019, // 通知用户文本聊天信息
 };
 
-enum class Modules
+enum Modules
 {
     REGISTERMOD = 0,
     RESETMOD = 1,
     LOGINMOD = 2,
 };
 
-enum class ErrorCodes
+enum ErrorCodes
 {
     SUCCESS = 0,
     ERR_JSON = 1, // Json解析失败
     ERR_NETWORK = 2,
 };
 
-enum class TipErr
+enum TipErr
 {
     TIP_SUCCESS = 0,
     TIP_EMAIL_ERR = 1,

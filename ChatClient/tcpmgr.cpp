@@ -7,30 +7,27 @@
 
 TcpMgr::TcpMgr(QObject *parent)
     : QObject{parent}, host_(""), port_(0),
-    b_recv_pending_(false), msg_id_(0), msg_len_(0)
+      b_recv_pending_(false), msg_id_(0), msg_len_(0)
 {
     initSignals();
-    initHttpHandlers();
+    initHandlers();
 }
 
 void TcpMgr::initSignals()
 {
-    connect(&socket_, &QTcpSocket::connected, this, [&](){
-        emit sig_con_success(true);
-    });
+    connect(&socket_, &QTcpSocket::connected, this, [&]()
+            { emit sig_con_success(true); });
 
-    connect(&socket_, &QTcpSocket::readyRead, this, [&](){
-        handleRead();
-    });
+    connect(&socket_, &QTcpSocket::readyRead, this, [&]()
+            { handleRead(); });
 
-    connect(&socket_, &QTcpSocket::errorOccurred, this, [&](auto error){
+    connect(&socket_, &QTcpSocket::errorOccurred, this, [&](auto error)
+            {
         Q_UNUSED(error);
-        qDebug() << "Error:" << socket_.errorString();
-    });
+        qDebug() << "Error:" << socket_.errorString(); });
 
-    connect(&socket_, &QTcpSocket::disconnected, this, [&](){
-        qDebug() << "Disconnected from server.";
-    });
+    connect(&socket_, &QTcpSocket::disconnected, this, [&]()
+            { qDebug() << "Disconnected from server."; });
 
     /*
      * 这里为什么采取信号槽，而不是void Send(RequestId reqId, QString data);
@@ -45,11 +42,14 @@ void TcpMgr::initSignals()
     connect(this, &TcpMgr::sig_send_data, this, &TcpMgr::slot_send_data);
 }
 
-void TcpMgr::initHttpHandlers()
+void TcpMgr::initHandlers()
 {
-    handlers_.insert(RequestId::ID_CHAT_LOGIN_RSP,[this](RequestId id, QByteArray data){
-        handleChatLoginRsp(id, data);
-    });
+    // 登录回包
+    handlers_.insert(RequestId::ID_CHAT_LOGIN_RSP, [this](RequestId id, QByteArray data)
+                     { handleChatLoginRsp(id, data); });
+    // 用户搜索回包
+    handlers_.insert(RequestId::ID_SEARCH_USER_RSP, [this](RequestId id, QByteArray data)
+                     { handleSearchUserRsp(id, data); });
 }
 
 void TcpMgr::handleRead()
@@ -60,11 +60,14 @@ void TcpMgr::handleRead()
     stream.setVersion(QDataStream::Qt_5_15);
     stream.setByteOrder(QDataStream::BigEndian);
 
-    while (true) {
+    while (true)
+    {
         // 解析头部
-        if(!b_recv_pending_){
+        if (!b_recv_pending_)
+        {
             int head_len = sizeof(msg_id_) + sizeof(msg_len_);
-            if(buffer_.size() < head_len){
+            if (buffer_.size() < head_len)
+            {
                 return;
             }
 
@@ -74,8 +77,9 @@ void TcpMgr::handleRead()
             qDebug() << "Receive Message ID:" << msg_id_ << ", Message Length:" << msg_len_;
         }
 
-        //消息体
-        if(buffer_.size() < msg_len_){
+        // 消息体
+        if (buffer_.size() < msg_len_)
+        {
             b_recv_pending_ = true; // 数据不够，等待更多数据到达
             return;
         }
@@ -94,21 +98,24 @@ void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
     qDebug() << "handle id is: " << toInt(id) << " data is " << data;
     // 读取json
     auto jsonDoc = QJsonDocument::fromJson(data);
-    if (jsonDoc.isNull() || !jsonDoc.isObject()) {
+    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    {
         qDebug() << "Failed to create QJsonDocument.";
         return;
     }
 
     auto jsonObj = jsonDoc.object();
-    if (!jsonObj.contains("error")) {
+    if (!jsonObj.contains("error"))
+    {
         auto error = toInt(ErrorCodes::ERR_JSON);
-        qDebug() << "Login Failed, err is Json Parse Err" << error ;
+        qDebug() << "Login Failed, err is Json Parse Err" << error;
         return;
     }
 
     auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
-    if(error != ErrorCodes::SUCCESS){
-        qDebug() << "Login Failed, err is " << jsonObj["error"].toInt() ;
+    if (error != ErrorCodes::SUCCESS)
+    {
+        qDebug() << "Login Failed, err is " << jsonObj["error"].toInt();
         emit sig_login_failed(error);
         return;
     }
@@ -122,12 +129,50 @@ void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
 void TcpMgr::handleMsg(RequestId id, QByteArray data)
 {
     auto iter = handlers_.find(id);
-    if(iter == handlers_.end()){
-        qDebug()<< "not found id ["<< toInt(id) << "] to handle";
-        return ;
+    if (iter == handlers_.end())
+    {
+        qDebug() << "not found id [" << toInt(id) << "] to handle";
+        return;
     }
 
     iter.value()(id, data);
+}
+
+void TcpMgr::handleSearchUserRsp(RequestId id, QByteArray data)
+{
+    qDebug() << "handle id is " << id << " data is " << data;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    {
+        qDebug() << "Failed to create QJsonDocument.";
+        return;
+    }
+
+    auto jsonObj = jsonDoc.object();
+    if (!jsonObj.contains("error"))
+    {
+        int error = ErrorCodes::ERR_JSON;
+        qDebug() << "Search User Failed, err is Json Parse Err" << error;
+        emit sig_user_search(nullptr);
+        return;
+    }
+
+    if (jsonObj["error"].toInt() != ErrorCodes::SUCCESS)
+    {
+        qDebug() << "Search User Failed, err is " << jsonObj["error"].toInt();
+        emit sig_user_search(nullptr);
+        return;
+    }
+
+    auto search_info = std::make_shared<SearchInfo>(
+        jsonObj["uid"].toInt(),
+        jsonObj["name"].toString(),
+        jsonObj["nick"].toString(),
+        jsonObj["desc"].toString(),
+        jsonObj["sex"].toInt(),
+        jsonObj["icon"].toString());
+    // 发送信号
+    emit sig_user_search(search_info);
 }
 
 void TcpMgr::slot_tcp_connect(ServerInfo s)
@@ -139,16 +184,16 @@ void TcpMgr::slot_tcp_connect(ServerInfo s)
     socket_.connectToHost(host_, port_);
 }
 
-void TcpMgr::slot_send_data(RequestId reqId, QString msg)
+void TcpMgr::slot_send_data(RequestId reqId, QByteArray dataBytes)
 {
-    auto data = msg.toUtf8();
     auto id = static_cast<quint16>(reqId);
-    auto len = static_cast<quint16>(data.size());
+    auto len = static_cast<quint16>(dataBytes.length());
+
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out.setByteOrder(QDataStream::BigEndian);
-    out << id << len;
-    block.append(data); // 将数据体追加到缓冲区,而不是使用数据流，避免数据体被转换字节序
+    out.setByteOrder(QDataStream::BigEndian); // 设置大端序
+    out << id << len;                         // 写入消息头
+    block.append(dataBytes);                  // 将数据体追加到缓冲区,而不是使用数据流，避免数据体被转换字节序
     socket_.write(block);
-    qDebug() << "send id :" << id << ", send len:" << len << ", send data: " << msg;
+    qDebug() << "tcp mgr send byte data is " << block;
 }

@@ -94,6 +94,8 @@ void ChatDialog::initUI()
     // 显示一个红点（测试用）
     ui->side_chat_lb->ShowRedPoint(true);
     installEventFilter(this);
+    // 关联搜索编辑框
+    ui->search_list->SetSearchEdit(ui->search_edit);
 }
 
 void ChatDialog::initSignals()

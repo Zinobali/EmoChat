@@ -21,10 +21,11 @@ public:
     QString token() const;
     void setToken(const QString &newToken);
 
-    std::vector<std::shared_ptr<ApplyInfo> > apply_list() const;
-    void setApply_list(const std::vector<std::shared_ptr<ApplyInfo> > &newApply_list);
-    std::vector<std::shared_ptr<FriendInfo> > friend_list() const;
-    void setFriend_list(const std::vector<std::shared_ptr<FriendInfo> > &newFriend_list);
+    std::vector<std::shared_ptr<ApplyInfo>> apply_list() const;
+    void setApply_list(const std::vector<std::shared_ptr<ApplyInfo>> &newApply_list);
+    std::vector<std::shared_ptr<FriendInfo>> friend_list() const;
+    void setFriend_list(const std::vector<std::shared_ptr<FriendInfo>> &newFriend_list);
+    bool CheckFriendById(int uid); // 判断是否为好友
 
 private:
     explicit UserMgr();
