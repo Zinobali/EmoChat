@@ -32,21 +32,21 @@ StatusServiceImpl::StatusServiceImpl() {
 
     std::vector<std::string> server_names;
     std::stringstream ss(server_list);
-    std::string name;
+    std::string server_name;
 
-    while (std::getline(ss, name, ',')) {
-        server_names.push_back(name);
+    while (std::getline(ss, server_name, ',')) {
+        server_names.push_back(server_name);
     }
 
-    for (auto& n : server_names) {
-        if (config[n]["Name"].empty()) {
+    for (auto& name : server_names) {
+        if (config[name]["Name"].empty()) {
             continue;
         }
 
         auto server = std::make_shared<ChatServer>();
-        server->name_ = config[n]["Name"];
-        server->host_ = config[n]["Host"];
-        server->port_ = config[n]["Port"];
+        server->name_ = config[name]["Name"];
+        server->host_ = config[name]["Host"];
+        server->port_ = config[name]["Port"];
         servers_[server->name_] = server;
     }
 }

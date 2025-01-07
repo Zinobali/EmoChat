@@ -15,16 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsioIOServicePool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatGrpcClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="ChatServer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="AsioIOServicePool.cpp">
+    <ClCompile Include="ChatServiceImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ConfigMgr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CServer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CSession.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="LogicSystem.cpp">
@@ -36,28 +45,19 @@
     <ClCompile Include="message.pb.cc">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CSession.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="MsgNode.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="StatusGrpcClient.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="RedisMgr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MySQLMgr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ChatGrpcClient.cpp">
+    <ClCompile Include="RedisMgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusGrpcClient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UserMgr.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ChatServiceImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,10 +65,28 @@
     <ClInclude Include="AsioIOServicePool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ChatGrpcClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatServiceImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="ConfigMgr.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CServer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CSession.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GrpcConnPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="LogicSystem.h">
@@ -80,43 +98,25 @@
     <ClInclude Include="message.pb.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Singleton.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CSession.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="MsgNode.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="global.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="StatusGrpcClient.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="RedisMgr.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MySQLMgr.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="RedisMgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusGrpcClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="threadsafe_queue.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ChatGrpcClient.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="GrpcConnPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="UserMgr.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ChatServiceImpl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="data.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
