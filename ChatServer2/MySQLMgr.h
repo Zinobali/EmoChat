@@ -40,6 +40,7 @@ public:
     bool CheckPwd(const std::string& email, const std::string& pwd, UserInfo& user_info);
     std::shared_ptr<UserInfo> GetUser(int uid);
     std::shared_ptr<UserInfo> GetUser(const std::string& name);
+    bool AddFriendApply(int from_id, int to_id);
 
 private:
     std::string GenerateSalt(); // Éú³ÉÑÎ
@@ -48,7 +49,6 @@ private:
 
     std::unique_ptr<MySQLConnectionPool> pool_;
     std::string schema_;
-
 };
 
 class MySQLMgr : public Singleton<MySQLMgr>
@@ -63,6 +63,7 @@ public:
     bool CheckPwd(const std::string& email, const std::string& pwd, UserInfo& user_info);
     std::shared_ptr<UserInfo> GetUser(int uid);
     std::shared_ptr<UserInfo> GetUser(const std::string& name);
+    bool AddFriendApply(int from_id, int to_id);
 
 private:
     MySQLMgr() = default;

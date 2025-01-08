@@ -3,6 +3,9 @@
 #include <QEvent>
 #include "usermgr.h"
 #include <QScrollBar>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "tcpmgr.h"
 
 ApplyFriend::ApplyFriend(QWidget *parent)
     : QDialog(parent), ui(new Ui::ApplyFriend)
@@ -248,7 +251,7 @@ void ApplyFriend::addOrUpdateLabel(const QString &text, QWidget *parent, bool se
     }
 
     // 不存在则新增标签
-    int fake_line = 2; //此功能还未设计完毕，预留接口，勿用
+    int fake_line = 2; // 此功能还未设计完毕，预留接口，勿用
     auto *lb = createLabel(text, _tip_cur_point, _tip_cur_point, parent, fake_line);
     _add_labels[text] = lb;
     _add_label_keys.push_back(text);
@@ -271,9 +274,9 @@ void ApplyFriend::ShowMoreLabel()
     for (auto &added_key : _add_label_keys)
     {
         auto added_lb = _add_labels[added_key];
-        QFontMetrics fontMetrics(added_lb->font());      // 获取QLabel控件的字体信息
-        textWidth = fontMetrics.width(added_lb->text()); // 获取文本的宽度
-        textHeight = fontMetrics.height();               // 获取文本的高度
+        QFontMetrics fontMetrics(added_lb->font());                  // 获取QLabel控件的字体信息
+        textWidth = fontMetrics.horizontalAdvance(added_lb->text()); // 获取文本的宽度
+        textHeight = fontMetrics.height();                           // 获取文本的高度
 
         if (_tip_cur_point.x() + textWidth + tip_offset > ui->lb_list->width())
         {
@@ -302,9 +305,9 @@ void ApplyFriend::ShowMoreLabel()
         lb->setText(_tip_data[i]);
         connect(lb, &ClickedLabel::clicked, this, &ApplyFriend::SlotChangeFriendLabelByTip);
 
-        QFontMetrics fontMetrics(lb->font());          // 获取QLabel控件的字体信息
-        int textWidth = fontMetrics.width(lb->text()); // 获取文本的宽度
-        int textHeight = fontMetrics.height();         // 获取文本的高度
+        QFontMetrics fontMetrics(lb->font());                      // 获取QLabel控件的字体信息
+        int textWidth = fontMetrics.horizontalAdvance(lb->text()); // 获取文本的宽度
+        int textHeight = fontMetrics.height();                     // 获取文本的高度
 
         if (_tip_cur_point.x() + textWidth + tip_offset > ui->lb_list->width())
         {
@@ -357,9 +360,9 @@ void ApplyFriend::SlotLabelEnter()
     qDebug() << "ui->lb_list->width() is " << ui->lb_list->width();
     qDebug() << "_tip_cur_point.x() is " << _tip_cur_point.x();
 
-    QFontMetrics fontMetrics(lb->font());          // 获取QLabel控件的字体信息
-    int textWidth = fontMetrics.width(lb->text()); // 获取文本的宽度
-    int textHeight = fontMetrics.height();         // 获取文本的高度
+    QFontMetrics fontMetrics(lb->font());                      // 获取QLabel控件的字体信息
+    int textWidth = fontMetrics.horizontalAdvance(lb->text()); // 获取文本的宽度
+    int textHeight = fontMetrics.height();                     // 获取文本的高度
     qDebug() << "textWidth is " << textWidth;
 
     if (_tip_cur_point.x() + textWidth + tip_offset + 3 > ui->lb_list->width())
@@ -503,9 +506,9 @@ void ApplyFriend::SlotAddFirendLabelByClickTip(QString text)
     qDebug() << "ui->lb_list->width() is " << ui->lb_list->width();
     qDebug() << "_tip_cur_point.x() is " << _tip_cur_point.x();
 
-    QFontMetrics fontMetrics(lb->font());          // 获取QLabel控件的字体信息
-    int textWidth = fontMetrics.width(lb->text()); // 获取文本的宽度
-    int textHeight = fontMetrics.height();         // 获取文本的高度
+    QFontMetrics fontMetrics(lb->font());                      // 获取QLabel控件的字体信息
+    int textWidth = fontMetrics.horizontalAdvance(lb->text()); // 获取文本的宽度
+    int textHeight = fontMetrics.height();                     // 获取文本的高度
     qDebug() << "textWidth is " << textWidth;
 
     if (_tip_cur_point.x() + textWidth + tip_offset + 3 > ui->lb_list->width())
@@ -526,6 +529,33 @@ void ApplyFriend::SlotAddFirendLabelByClickTip(QString text)
 
 void ApplyFriend::SlotApplySure()
 {
+    // 创建申请json
+    QJsonObject jsonObj;
+    auto uid = UserMgr::GetInstance()->uid();
+    jsonObj["uid"] = uid;
+    auto name = ui->name_ed->text();
+    if (name.isEmpty())
+    {
+        return;
+    }
+
+    jsonObj["applyname"] = name;
+
+    auto backName = ui->back_ed->text();
+    if (backName.isEmpty())
+    {
+        return;
+    }
+
+    jsonObj["bakname"] = backName;
+    jsonObj["touid"] = _si->_uid;
+
+    QJsonDocument doc(jsonObj);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    // 发送请求
+    emit TcpMgr::GetInstance()->sig_send_data(RequestId::ID_ADD_FRIEND_REQ, data);
+
     this->hide();
     deleteLater();
 }

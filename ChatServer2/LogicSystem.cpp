@@ -8,6 +8,7 @@
 #include "ConfigMgr.h"
 #include "UserMgr.h"
 #include <regex>
+#include "ChatGrpcClient.h"
 
 LogicNode::LogicNode(std::shared_ptr<CSession> session, std::shared_ptr<RecvNode> recv_node)
     : session_(session), recv_node_(recv_node) {}
@@ -53,6 +54,10 @@ void LogicSystem::RegisterHandlers() {
     // 搜索好友
     handlers_[MSG_IDS::ID_SEARCH_USER_REQ] = [this](std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
         SearchUserHandler(session, msg_id, msg_data);
+        };
+    // 添加好友
+    handlers_[MSG_IDS::ID_ADD_FRIEND_REQ] = [this](std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
+        AddFriendApplyHandler(session, msg_id, msg_data);
         };
 }
 
@@ -333,4 +338,75 @@ void LogicSystem::GetUserByName(const std::string& str, Json::Value& return_valu
     return_value = redis_root;
     return_value["error"] = ErrorCodes::Success;
     return;
+}
+
+void LogicSystem::AddFriendApplyHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(msg_data, root);
+    auto uid = root["uid"].asInt();
+    auto apply_name = root["applyname"].asString();
+    auto back_name = root["bakname"].asString();
+    auto to_uid = root["touid"].asInt();
+    std::cout << "user login uid is  " << uid << " applyname  is " << apply_name << " bakname is " << back_name << " touid is " << to_uid << std::endl;
+
+    Json::Value return_value;
+    return_value["error"] = ErrorCodes::Success;
+    Defer return_value_defer([&]() {
+        session->Send(MSG_IDS::ID_ADD_FRIEND_RSP, return_value.toStyledString());
+        });
+
+    // 先更新数据库
+    MySQLMgr::GetInstance()->AddFriendApply(uid, to_uid);
+
+    // 查询redis，找到对方的server ip
+    auto to_ip_key = USERIPPREFIX + std::to_string(to_uid);
+    auto to_ip_value = std::string();
+    bool ip_ok = RedisMgr::GetInstance().Get(to_ip_key, to_ip_value);
+    if (!ip_ok) {
+        return;
+    }
+
+    auto& config = ConfigMgr::GetInstance();
+    auto self_server_name = config["SelfServer"]["Name"];
+
+    // 查自己信息
+    auto base_key = USER_BASE_INFO + std::to_string(uid);
+    auto apply_info = std::make_shared<UserInfo>();
+    bool info_ok = GetBaseInfo(base_key, uid, apply_info);
+
+    // 判断是否在同一个服务器
+    if (to_ip_value == self_server_name) {
+        // 获取对方session
+        auto session = UserMgr::GetInstance()->GetSession(to_uid);
+        if (session) {
+            Json::Value notify_value;
+            notify_value["error"] = ErrorCodes::Success;
+            notify_value["applyuid"] = to_uid;
+            notify_value["name"] = apply_name;
+            notify_value["desc"] = "";
+            // 添加通知对方的基本信息
+            if (info_ok) {
+                notify_value["icon"] = apply_info->icon;
+                notify_value["sex"] = apply_info->sex;
+                notify_value["nick"] = apply_info->nick;
+            }
+            session->Send(MSG_IDS::ID_NOTIFY_ADD_FRIEND_REQ, notify_value.toStyledString());
+        }
+        return;
+    }
+
+    // 跨服务器通知
+    AddFriendReq add_request;
+    add_request.set_apply_uid(uid);
+    add_request.set_to_uid(to_uid);
+    add_request.set_name(apply_name);
+    add_request.set_description("");
+    if (info_ok) {
+        add_request.set_icon(apply_info->icon);
+        add_request.set_sex(apply_info->sex);
+        add_request.set_nickname(apply_info->nick);
+    }
+
+    ChatGrpcClient::GetInstance()->NotifyAddFriend(to_ip_value, add_request);
 }

@@ -45,6 +45,7 @@ private:
     bool IsPureDigit(const std::string& str);
     void GetUserByUid(const std::string& str, Json::Value& return_value);
     void GetUserByName(const std::string& str, Json::Value& return_value);
+    void AddFriendApplyHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
 
 private:
     std::thread worker_thread_;

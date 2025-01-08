@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
+#include "CSession.h"
 
-class CSession;
 class UserMgr : public Singleton<UserMgr>
 {
     friend class Singleton<UserMgr>;

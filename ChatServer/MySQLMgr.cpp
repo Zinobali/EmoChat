@@ -251,7 +251,7 @@ std::shared_ptr<UserInfo> MySQLDao::GetUser(int uid) {
         std::cerr << "Standard exception caught in MySQLDao::GetUser(int): " << ex.what() << std::endl;
         return nullptr;
     } catch (...) {
-        std::cerr << "Unknown exception caught in MySQLDao::GetUser(int)" << std::endl;
+        std::cerr << "Unknown exception caught in MySQLDao::GetUser(int): " << std::endl;
         return nullptr;
     }
 }
@@ -308,8 +308,56 @@ std::shared_ptr<UserInfo> MySQLDao::GetUser(const std::string& name) {
         std::cerr << "Standard exception caught in MySQLDao::GetUser(string): " << ex.what() << std::endl;
         return nullptr;
     } catch (...) {
-        std::cerr << "Unknown exception caught in MySQLDao::GetUser(string)" << std::endl;
+        std::cerr << "Unknown exception caught in MySQLDao::GetUser(string): " << std::endl;
         return nullptr;
+    }
+}
+
+bool MySQLDao::AddFriendApply(int from_id, int to_id) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
+
+    try {
+        // 开始事务
+        conn->startTransaction();
+
+        // 获取数据库和表
+        auto emo_chat = conn->getSchema(schema_);
+        auto friend_apply_table = emo_chat.getTable("friend_apply");
+
+        // 查询是否存在相同的from_uid 和 to_uid
+        auto result = friend_apply_table.select("from_uid", "to_uid")
+            .where("from_uid = :from AND to_uid = :to")
+            .bind("from", from_id)
+            .bind("to", to_id)
+            .execute();
+
+        if (result.count() > 0) {
+            // 如果存在不进行操作
+            return false;
+        }
+
+        // 插入数据
+        friend_apply_table.insert("from_uid", "to_uid")
+            .values(from_id, to_id)
+            .execute();
+        conn->commit();
+        std::cout << "AddFriendApply operation successful." << std::endl;
+        return true;
+
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query in MySQLDao::AddFriendApply: " << err.what() << std::endl;
+        return false;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::AddFriendApply: " << ex.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::AddFriendApply: " << std::endl;
+        return false;
     }
 }
 
@@ -343,4 +391,8 @@ std::shared_ptr<UserInfo> MySQLMgr::GetUser(int uid) {
 
 std::shared_ptr<UserInfo> MySQLMgr::GetUser(const std::string& name) {
     return dao_.GetUser(name);
+}
+
+bool MySQLMgr::AddFriendApply(int from_id, int to_id) {
+    return dao_.AddFriendApply(from_id, to_id);
 }

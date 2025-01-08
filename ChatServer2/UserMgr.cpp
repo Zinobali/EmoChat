@@ -1,5 +1,5 @@
 #include "UserMgr.h"
-#include "CSession.h"
+
 
 std::shared_ptr<CSession> UserMgr::GetSession(int uid) {
     std::lock_guard<std::mutex> lock(session_mutex_);
