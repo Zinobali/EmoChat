@@ -6,6 +6,7 @@ constexpr char USERTOKENPREFIX[] = "utoken_";
 constexpr char IPCOUNTPREFIX[] = "ipcount_";
 constexpr char USER_BASE_INFO[] = "ubaseinfo_";
 constexpr char LOGIN_COUNT[] = "logincount_";
+constexpr char NAME_INFO[] = "nameinfo_";
 
 class Defer {
 public:

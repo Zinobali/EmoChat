@@ -39,6 +39,7 @@ public:
     bool NameExist(const std::string& name);
     bool CheckPwd(const std::string& email, const std::string& pwd, UserInfo& user_info);
     std::shared_ptr<UserInfo> GetUser(int uid);
+    std::shared_ptr<UserInfo> GetUser(const std::string& name);
 
 private:
     std::string GenerateSalt(); // Éú³ÉÑÎ
@@ -61,6 +62,7 @@ public:
     bool NameExist(const std::string& name);
     bool CheckPwd(const std::string& email, const std::string& pwd, UserInfo& user_info);
     std::shared_ptr<UserInfo> GetUser(int uid);
+    std::shared_ptr<UserInfo> GetUser(const std::string& name);
 
 private:
     MySQLMgr() = default;

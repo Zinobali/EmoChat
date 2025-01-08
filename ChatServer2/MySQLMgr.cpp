@@ -201,11 +201,11 @@ bool MySQLDao::CheckPwd(const std::string& email, const std::string& pwd, UserIn
 
 std::shared_ptr<UserInfo> MySQLDao::GetUser(int uid) {
     auto conn = pool_->getConnection();
-    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
     if (!conn) {
         std::cerr << "Failed to get a database connection." << std::endl;
         return nullptr;
     }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
 
     try {
         auto users = conn->getSchema(schema_).getTable("user");
@@ -215,7 +215,14 @@ std::shared_ptr<UserInfo> MySQLDao::GetUser(int uid) {
             .bind("uid", uid)
             .execute()
             .fetchOne();
-        if (res && res.isNull()) {
+
+        if (!res) {
+            std::cerr << "No user found with uid: " << uid << std::endl;
+            return nullptr;
+        }
+
+        if (res.isNull()) {
+            std::cerr << "No user found with uid: " << uid << std::endl;
             return nullptr;
         }
 
@@ -238,7 +245,70 @@ std::shared_ptr<UserInfo> MySQLDao::GetUser(int uid) {
 
         return user_info;
     } catch (const mysqlx::Error& err) {
-        std::cerr << "Error executing query in MySQLDao::GetUser: " << err.what() << std::endl;
+        std::cerr << "Error executing query in MySQLDao::GetUser(int): " << err.what() << std::endl;
+        return nullptr;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::GetUser(int): " << ex.what() << std::endl;
+        return nullptr;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::GetUser(int)" << std::endl;
+        return nullptr;
+    }
+}
+
+std::shared_ptr<UserInfo> MySQLDao::GetUser(const std::string& name) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return nullptr;
+    }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
+
+    try {
+        auto users = conn->getSchema(schema_).getTable("user");
+        mysqlx::Row res = users
+            .select("uid", "name", "email", "nick", "desc", "sex", "icon")
+            .where("name = :name")
+            .bind("name", name)
+            .execute()
+            .fetchOne();
+
+        if (!res) {
+            std::cerr << "No user found with name: " << name << std::endl;
+            return nullptr;
+        }
+
+        if (res.isNull()) {
+            std::cerr << "No user found with name: " << name << std::endl;
+            return nullptr;
+        }
+
+        auto query_id = res[0].get<int>();
+        auto query_name = res[1].get<std::string>();
+        auto query_email = res[2].get<std::string>();
+        std::cout << "============================================" << std::endl;
+        std::cout << "select user by name: " << name << ", user name: " << query_name << ", email: " << query_email << std::endl;
+        std::cout << "============================================" << std::endl;
+
+        // 创建一个UserInfo对象
+        auto user_info = std::make_shared<UserInfo>();
+        user_info->uid = query_id;
+        user_info->name = query_name;
+        user_info->email = query_email;
+        user_info->nick = res[3].isNull() ? "" : res[3].get<std::string>();
+        user_info->desc = res[4].isNull() ? "" : res[4].get<std::string>();
+        user_info->sex = res[5].isNull() ? 0 : res[5].get<int>();
+        user_info->icon = res[6].isNull() ? "" : res[6].get<std::string>();
+
+        return user_info;
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query in MySQLDao::GetUser(string): " << err.what() << std::endl;
+        return nullptr;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::GetUser(string): " << ex.what() << std::endl;
+        return nullptr;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::GetUser(string)" << std::endl;
         return nullptr;
     }
 }
@@ -269,4 +339,8 @@ bool MySQLMgr::CheckPwd(const std::string& email, const std::string& pwd, UserIn
 
 std::shared_ptr<UserInfo> MySQLMgr::GetUser(int uid) {
     return dao_.GetUser(uid);
+}
+
+std::shared_ptr<UserInfo> MySQLMgr::GetUser(const std::string& name) {
+    return dao_.GetUser(name);
 }

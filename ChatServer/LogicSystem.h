@@ -7,13 +7,17 @@
 #include "MsgNode.h"
 #include "CSession.h"
 #include "queue"
+#include <json/json.h>
+#include <json/value.h>
+#include <json/reader.h>
 
-
-
-class LogicNode {
+class LogicNode
+{
     friend class LogicSystem;
+
 public:
     LogicNode(std::shared_ptr<CSession> session, std::shared_ptr<RecvNode> recv_node);
+
 private:
     std::shared_ptr<CSession> session_;
     std::shared_ptr<RecvNode> recv_node_;
@@ -22,9 +26,10 @@ private:
 typedef std::function<void(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data)> MsgHandler;
 
 struct UserInfo;
-class LogicSystem :public Singleton<LogicSystem>
+class LogicSystem : public Singleton<LogicSystem>
 {
     friend class Singleton<LogicSystem>;
+
 public:
     ~LogicSystem();
     void PostMsgToQue(std::shared_ptr<LogicNode> logic_node);
@@ -36,6 +41,10 @@ private:
     void LoginHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
     void HandleMsg();
     bool GetBaseInfo(const std::string& base_key, int uid, std::shared_ptr<UserInfo>& userinfo);
+    void SearchUserHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
+    bool IsPureDigit(const std::string& str);
+    void GetUserByUid(const std::string& str, Json::Value& return_value);
+    void GetUserByName(const std::string& str, Json::Value& return_value);
 
 private:
     std::thread worker_thread_;
@@ -46,4 +55,3 @@ private:
     std::map<MSG_IDS, MsgHandler> handlers_;
     std::map<int, std::shared_ptr<UserInfo>> users_;
 };
-
