@@ -1,13 +1,14 @@
 #include "tcpmgr.h"
+
 #include <QDataStream>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+
 #include "usermgr.h"
 
 TcpMgr::TcpMgr(QObject *parent)
-    : QObject{parent}, host_(""), port_(0),
-      b_recv_pending_(false), msg_id_(0), msg_len_(0)
+    : QObject{parent}, host_(""), port_(0), b_recv_pending_(false), msg_id_(0), msg_len_(0)
 {
     initSignals();
     initHandlers();
@@ -80,7 +81,8 @@ void TcpMgr::handleRead()
             stream >> msg_id_ >> msg_len_;
 
             buffer_.remove(0, head_len);
-            qDebug() << "Receive Message ID:" << msg_id_ << ", Message Length:" << msg_len_;
+            qDebug() << "Receive Message ID:" << msg_id_
+                     << ", Message Length:" << msg_len_;
         }
 
         // 消息体
@@ -101,27 +103,19 @@ void TcpMgr::handleRead()
 
 void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
 {
-    qDebug() << "handle id is: " << toInt(id) << " data is " << data;
-    // 读取json
-    auto jsonDoc = QJsonDocument::fromJson(data);
-    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
     {
-        qDebug() << "Failed to create QJsonDocument.";
+        qDebug() << "Failed to parse json.";
+        emit sig_login_failed(ErrorCodes::ERR_JSON);
         return;
     }
 
-    auto jsonObj = jsonDoc.object();
-    if (!jsonObj.contains("error"))
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
     {
-        auto error = toInt(ErrorCodes::ERR_JSON);
-        qDebug() << "Login Failed, err is Json Parse Err" << error;
-        return;
-    }
-
-    auto error = static_cast<ErrorCodes>(jsonObj["error"].toInt());
-    if (error != ErrorCodes::SUCCESS)
-    {
-        qDebug() << "Login Failed, err is " << jsonObj["error"].toInt();
         emit sig_login_failed(error);
         return;
     }
@@ -146,24 +140,18 @@ void TcpMgr::handleMsg(RequestId id, QByteArray data)
 
 void TcpMgr::handleSearchUserRsp(RequestId id, QByteArray data)
 {
-    qDebug() << "handle id is " << id << " data is " << data;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
     {
-        qDebug() << "Failed to create QJsonDocument.";
-        return;
-    }
-
-    auto jsonObj = jsonDoc.object();
-    if (!jsonObj.contains("error"))
-    {
-        int error = ErrorCodes::ERR_JSON;
-        qDebug() << "Search User Failed, err is Json Parse Err" << error;
+        qDebug() << "Search User Failed, failed to parse json.";
         emit sig_user_search(nullptr);
         return;
     }
 
-    if (jsonObj["error"].toInt() != ErrorCodes::SUCCESS)
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
     {
         qDebug() << "Search User Failed, err is " << jsonObj["error"].toInt();
         emit sig_user_search(nullptr);
@@ -171,35 +159,26 @@ void TcpMgr::handleSearchUserRsp(RequestId id, QByteArray data)
     }
 
     auto search_info = std::make_shared<SearchInfo>(
-        jsonObj["uid"].toInt(),
-        jsonObj["name"].toString(),
-        jsonObj["nick"].toString(),
-        jsonObj["desc"].toString(),
-        jsonObj["sex"].toInt(),
-        jsonObj["icon"].toString());
+        jsonObj["uid"].toInt(), jsonObj["name"].toString(),
+        jsonObj["nick"].toString(), jsonObj["desc"].toString(),
+        jsonObj["sex"].toInt(), jsonObj["icon"].toString());
     // 发送信号
     emit sig_user_search(search_info);
 }
 
 void TcpMgr::handleAddFriendRsp(RequestId id, QByteArray data)
 {
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-
-    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
     {
-        qDebug() << "Failed to create QJsonDocument.";
+        qDebug() << "Add Friend Failed, failed to parse json.";
         return;
     }
 
-    auto jsonObj = jsonDoc.object();
-    if (!jsonObj.contains("error"))
-    {
-        int error = ErrorCodes::ERR_JSON;
-        qDebug() << "Add Friend Failed, err is Json Parse Err" << error;
-        return;
-    }
-
-    if (jsonObj["error"].toInt() != ErrorCodes::SUCCESS)
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
     {
         qDebug() << "Add Friend Failed, err is " << jsonObj["error"].toInt();
         return;
@@ -210,25 +189,20 @@ void TcpMgr::handleAddFriendRsp(RequestId id, QByteArray data)
 
 void TcpMgr::handleAddFriendReq(RequestId id, QByteArray data)
 {
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
-
-    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
     {
-        qDebug() << "Failed to create QJsonDocument.";
+        qDebug() << "handle add friend request Failed, failed to parse json.";
         return;
     }
 
-    auto jsonObj = jsonDoc.object();
-    if (!jsonObj.contains("error"))
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
     {
-        int error = ErrorCodes::ERR_JSON;
-        qDebug() << "Add Friend Failed, err is Json Parse Err" << error;
-        return;
-    }
-
-    if (jsonObj["error"].toInt() != ErrorCodes::SUCCESS)
-    {
-        qDebug() << "Add Friend Failed, err is " << jsonObj["error"].toInt();
+        qDebug() << "handle add friend request Failed, err is "
+                 << jsonObj["error"].toInt();
         return;
     }
 
@@ -244,6 +218,31 @@ void TcpMgr::handleAddFriendReq(RequestId id, QByteArray data)
     emit sig_friend_apply(apply_info);
 
     qDebug() << "Add Friend Success";
+}
+
+bool TcpMgr::parseJson(const QByteArray &data, QJsonObject &obj)
+{
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(data);
+    if (jsonDoc.isNull() || !jsonDoc.isObject())
+    {
+        qDebug() << "Failed to create QJsonDocument.";
+        return false;
+    }
+
+    obj = jsonDoc.object();
+    return true;
+}
+
+bool TcpMgr::checkErrorCode(const QJsonObject &obj, ErrorCodes &ec)
+{
+    if (!obj.contains("error"))
+    {
+        ec = ErrorCodes::ERR_JSON;
+        return false;
+    }
+
+    ec = static_cast<ErrorCodes>(obj["error"].toInt());
+    return ec == ErrorCodes::SUCCESS;
 }
 
 void TcpMgr::slot_tcp_connect(ServerInfo s)

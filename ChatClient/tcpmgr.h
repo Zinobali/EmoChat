@@ -1,12 +1,12 @@
 #ifndef TCPMGR_H
 #define TCPMGR_H
 
-#include <QObject>
-#include <singleton.h>
-#include <QTcpSocket>
 #include "global.h"
-#include <functional>
 #include "userdata.h"
+#include <QObject>
+#include <QTcpSocket>
+#include <functional>
+#include <singleton.h>
 
 struct ServerInfo
 {
@@ -28,8 +28,10 @@ private:
     void initSignals();
     void initHandlers();
     void handleRead();
-    void handleChatLoginRsp(RequestId id, QByteArray data);
     void handleMsg(RequestId id, QByteArray data);
+    bool parseJson(const QByteArray &data, QJsonObject &obj);    // 解析json
+    bool checkErrorCode(const QJsonObject &obj, ErrorCodes &ec); // 检查错误码
+    void handleChatLoginRsp(RequestId id, QByteArray data);
     void handleSearchUserRsp(RequestId id, QByteArray data);
     void handleAddFriendRsp(RequestId id, QByteArray data);
     void handleAddFriendReq(RequestId id, QByteArray data);
