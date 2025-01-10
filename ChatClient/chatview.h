@@ -15,6 +15,7 @@ public:
     explicit ChatView(QWidget *parent = nullptr);
     ~ChatView();
     void AppendChatItem(QWidget *item);
+    void removeAllItem();
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;

@@ -26,6 +26,7 @@ public:
     bool AlreadyApply(int uid);                          // 判断是否已经在 申请列表中
     void AddApplyList(std::shared_ptr<ApplyInfo> apply); // 添加单个好友申请
     void SetUserInfo(const std::shared_ptr<UserInfo> &user_info);
+    std::shared_ptr<UserInfo> GetUserInfo();
     std::vector<std::shared_ptr<ApplyInfo>> apply_list() const;   // 返回好友申请列表
     std::vector<std::shared_ptr<FriendInfo>> friend_list() const; // 返回好友列表
     void AppendApplyList(QJsonArray apply_array);

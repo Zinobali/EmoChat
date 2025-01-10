@@ -35,6 +35,11 @@ void UserMgr::SetUserInfo(const std::shared_ptr<UserInfo> &user_info)
     user_info_ = user_info;
 }
 
+std::shared_ptr<UserInfo> UserMgr::GetUserInfo()
+{
+    return user_info_;
+}
+
 std::vector<std::shared_ptr<FriendInfo>> UserMgr::friend_list() const
 {
     std::vector<std::shared_ptr<FriendInfo>> ret;

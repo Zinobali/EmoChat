@@ -109,6 +109,8 @@ void ChatDialog::initSignals()
     connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_add_auth_friend, this, &ChatDialog::slot_add_auth_firend);
     // 连接自己同意好友认证后刷新界面
     connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_auth_rsp, this, &ChatDialog::slot_auth_rsp);
+    // 连接聊天跳转信号
+    connect(ui->search_list, &SearchList::sig_jump_chat_item, this, &ChatDialog::slot_jump_chat_item);
 }
 
 void ChatDialog::addChatUserList()
@@ -166,6 +168,118 @@ void ChatDialog::handleGlobalMousePress(QMouseEvent *event)
     {
         ui->search_edit->clear();
         ShowSearch(false);
+    }
+}
+
+void ChatDialog::setSelectedChatItem(int uid)
+{
+    if (ui->chatting_list->count() <= 0)
+    {
+        return;
+    }
+
+    if (uid == 0)
+    {
+        // 如果uid为0，则选中第一个item
+        ui->chatting_list->setCurrentRow(0);
+        QListWidgetItem *firstItem = ui->chatting_list->item(0);
+        if (!firstItem)
+        {
+            return;
+        }
+
+        // 获取item中的widget
+        QWidget *widget = ui->chatting_list->itemWidget(firstItem);
+        if (!widget)
+        {
+            return;
+        }
+
+        auto chat_item = qobject_cast<ChatUserItem *>(widget);
+        if (!chat_item)
+        {
+            return;
+        }
+
+        cur_chat_uid_ = chat_item->GetUserInfo()->_uid;
+
+        return;
+    }
+
+    // 找不到对应的item
+    auto iter = chat_items_map_.find(uid);
+    if (iter == chat_items_map_.end())
+    {
+        ui->chatting_list->setCurrentRow(0);
+        return;
+    }
+
+    ui->chatting_list->setCurrentItem(iter.value());
+    cur_chat_uid_ = uid;
+    return;
+}
+
+void ChatDialog::setSelectedChatPage(int uid)
+{
+    if (ui->chatting_list->count() <= 0)
+    {
+        return;
+    }
+
+    if (uid == 0)
+    {
+        auto item = ui->chatting_list->item(0);
+        QWidget *widget = ui->chatting_list->itemWidget(item);
+        if (!widget)
+        {
+            return;
+        }
+
+        auto chat_item = qobject_cast<ChatUserItem *>(widget);
+        if (!chat_item)
+        {
+            return;
+        }
+
+        // 设置聊天页面的用户信息
+        auto user_info = chat_item->GetUserInfo();
+        ui->chat_page->SetUserInfo(user_info);
+        return;
+    }
+
+    auto iter = chat_items_map_.find(uid);
+    if (iter == chat_items_map_.end())
+    {
+        return;
+    }
+
+    QWidget *widget = ui->chatting_list->itemWidget(iter.value());
+    if (!widget)
+    {
+        return;
+    }
+
+    // 转换成基类的item
+    ListItemBase *list_item = qobject_cast<ListItemBase *>(widget);
+    if (!list_item)
+    {
+        return;
+    }
+
+    // 获取item的类型
+    auto type = list_item->item_type();
+    if (type == ListItemType::CHAT_USER_ITEM)
+    {
+        auto chat_item = qobject_cast<ChatUserItem *>(widget);
+        if (!chat_item)
+        {
+            return;
+        }
+
+        // 设置聊天页面的用户信息
+        auto user_info = chat_item->GetUserInfo();
+        ui->chat_page->SetUserInfo(user_info);
+        return;
     }
 }
 
@@ -277,4 +391,34 @@ void ChatDialog::slot_auth_rsp(std::shared_ptr<AuthRsp> auth_rsp)
     ui->chatting_list->insertItem(0, item);
     ui->chatting_list->setItemWidget(item, chat_user_item);
     chat_items_map_.insert(auth_rsp->_uid, item);
+}
+
+void ChatDialog::slot_jump_chat_item(std::shared_ptr<SearchInfo> si)
+{
+    auto iter = chat_items_map_.find(si->_uid);
+    if (iter != chat_items_map_.end())
+    {
+        // 找到了已在聊天列表的item
+        ui->chatting_list->scrollToItem(iter.value());
+        ui->side_chat_lb->SetSelected(true); // 跳转到聊天页面
+        setSelectedChatItem(si->_uid);       // 设置选中的item
+        setSelectedChatPage(si->_uid);       // 跳转对应的聊天窗口
+        slot_side_chat_clicked();            // 设置侧边栏状态
+        return;
+    }
+
+    // 没找到，创建新的item
+    auto *chat_user_item = new ChatUserItem();
+    auto user_info = std::make_shared<UserInfo>(si);
+    chat_user_item->SetInfo(user_info);
+    QListWidgetItem *item = new QListWidgetItem();
+    item->setSizeHint(chat_user_item->sizeHint());
+    ui->chatting_list->insertItem(0, item);
+    ui->chatting_list->setItemWidget(item, chat_user_item); // 添加自定义item(widget)
+    chat_items_map_.insert(si->_uid, item);
+
+    ui->side_chat_lb->SetSelected(true);
+    setSelectedChatItem(si->_uid);
+    setSelectedChatPage(si->_uid);
+    slot_side_chat_clicked();
 }

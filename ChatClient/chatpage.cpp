@@ -5,6 +5,7 @@
 #include <QStyleOption>
 #include "textbubble.h"
 #include "picturebubble.h"
+#include "usermgr.h"
 
 ChatPage::ChatPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::ChatPage)
@@ -17,6 +18,24 @@ ChatPage::ChatPage(QWidget *parent)
 ChatPage::~ChatPage()
 {
     delete ui;
+}
+
+void ChatPage::SetUserInfo(std::shared_ptr<UserInfo> user_info)
+{
+    _user_info = user_info;
+        //设置ui界面
+    ui->title_lb->setText(_user_info->_name);
+    ui->chat_data_list->removeAllItem();
+    for(auto & msg : user_info->_chat_msgs){
+        AppendChatMsg(msg);
+    }
+}
+
+void ChatPage::AppendChatMsg(std::shared_ptr<TextChatData> msg)
+{
+    auto self_info = UserMgr::GetInstance()->GetUserInfo();
+    ChatRole role;
+    //todo... 添加聊天显示
 }
 
 void ChatPage::paintEvent(QPaintEvent *event)
@@ -41,6 +60,11 @@ void ChatPage::initUI()
 void ChatPage::initSignals()
 {
     connect(ui->chat_edit, &MsgTextEdit::sig_send_msg, this, &ChatPage::on_send_btn_clicked);
+}
+
+void ChatPage::clearItems()
+{
+
 }
 
 void ChatPage::on_send_btn_clicked()

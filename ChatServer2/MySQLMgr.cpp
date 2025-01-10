@@ -425,14 +425,14 @@ bool MySQLDao::AuthFriendApply(int from_id, int to_id, const std::string& back_n
         auto emo_chat = conn->getSchema(schema_);
         auto friend_apply_table = emo_chat.getTable("friend_apply");
         // 更新friend_apply的认证状态
-        auto result1 = friend_apply_table.update()
+        auto result = friend_apply_table.update()
             .set("status", 1)
             .where("from_uid = :from_uid AND to_uid = :to_uid")
             // 将from_uid和to_uid交换位置
             .bind("from_uid", to_id)
             .bind("to_uid", from_id)
             .execute();
-        if (result1.getAffectedItemsCount() == 0) {
+        if (result.getAffectedItemsCount() == 0) {
             conn->rollback();
             return false;
         }
@@ -441,9 +441,16 @@ bool MySQLDao::AuthFriendApply(int from_id, int to_id, const std::string& back_n
         // 选择数据库
         conn->sql("USE " + schema_).execute();
         // 准备SQL语句
-        auto stmt = conn->sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?) ");
-        auto result2 = stmt.bind(from_id, to_id, back_name).execute();
-        if (result2.getAffectedItemsCount() < 0) {
+        auto stmt1 = conn->sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?) ");
+        auto result1 = stmt1.bind(from_id, to_id, back_name).execute();
+        if (result1.getAffectedItemsCount() == 0) {
+            conn->rollback();
+            return false;
+        }
+
+        auto stmt2 = conn->sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?) ");
+        auto result2 = stmt2.bind(to_id, from_id, back_name).execute();
+        if (result2.getAffectedItemsCount() == 0) {
             conn->rollback();
             return false;
         }
