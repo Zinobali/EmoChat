@@ -422,6 +422,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>CustomizeEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">customizeedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>ClickedBtn</class>
    <extends>QPushButton</extends>
    <header location="global">clickedbtn.h</header>
@@ -431,11 +436,6 @@
    <extends>QWidget</extends>
    <header location="global">chatpage.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ChatUserList</class>
-   <extends>QListView</extends>
-   <header location="global">chatuserlist.h</header>
   </customwidget>
   <customwidget>
    <class>StateWidget</class>
@@ -460,9 +460,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CustomizeEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">customizeedit.h</header>
+   <class>ChatUserList</class>
+   <extends>QListWidget</extends>
+   <header location="global">chatuserlist.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -22,9 +22,8 @@ SOURCES += \
     chatdialog.cpp \
     chatitembase.cpp \
     chatpage.cpp \
-    chatuserdelegate.cpp \
+    chatuseritem.cpp \
     chatuserlist.cpp \
-    chatuserlistmodel.cpp \
     chatview.cpp \
     clickedbtn.cpp \
     clickedlabel.cpp \
@@ -66,9 +65,8 @@ HEADERS += \
     chatdialog.h \
     chatitembase.h \
     chatpage.h \
-    chatuserdelegate.h \
+    chatuseritem.h \
     chatuserlist.h \
-    chatuserlistmodel.h \
     chatview.h \
     clickedbtn.h \
     clickedlabel.h \
@@ -107,6 +105,7 @@ FORMS += \
     authenfriend.ui \
     chatdialog.ui \
     chatpage.ui \
+    chatuseritem.ui \
     chatview.ui \
     conuseritem.ui \
     findfaildlg.ui \

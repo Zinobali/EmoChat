@@ -1,6 +1,10 @@
 #include "authenfriend.h"
 #include "ui_authenfriend.h"
 #include <QScrollBar>
+#include "usermgr.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "tcpmgr.h"
 
 AuthenFriend::AuthenFriend(QWidget *parent)
     : QDialog(parent), ui(new Ui::AuthenFriend), _label_point(2, 6)
@@ -422,6 +426,28 @@ void AuthenFriend::SlotAddFirendLabelByClickTip(QString text)
 
 void AuthenFriend::SlotApplySure()
 {
+    QJsonObject jsonObj;
+    auto uid = UserMgr::GetInstance()->uid();
+    jsonObj["fromuid"] = uid;
+    jsonObj["touid"] = _apply_info->_uid;
+
+    // 备注名
+    QString back_name = "";
+    if (ui->back_ed->text().isEmpty())
+    {
+        back_name = ui->back_ed->placeholderText();
+    }
+    else
+    {
+        back_name = ui->back_ed->text();
+    }
+    jsonObj["back"] = back_name;
+
+    QJsonDocument doc(jsonObj);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    // 发送验证请求给服务器
+    emit TcpMgr::GetInstance() -> sig_send_data(RequestId::ID_AUTH_FRIEND_REQ, data);
 
     this->hide();
     deleteLater();

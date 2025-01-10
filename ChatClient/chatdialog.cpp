@@ -12,10 +12,11 @@
 #include "global.h"
 #include "tcpmgr.h"
 #include "usermgr.h"
+#include "chatuseritem.h"
 
 ChatDialog::ChatDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::ChatDialog), mode_(ChatUIMode::ChatMode), state_(ChatUIMode::ChatMode),
-      b_loading_(false), last_widget_(nullptr)
+    b_loading_(false), last_widget_(nullptr)
 {
     ui->setupUi(this);
     initUI();
@@ -108,21 +109,28 @@ void ChatDialog::initSignals()
 
 void ChatDialog::addChatUserList()
 {
-    for (int var = 0; var < 20; ++var)
+    for (int var = 0; var < 13; ++var)
     {
+
+        // 生成测试随机好友信息
         int rand_val = QRandomGenerator::global()->bounded(100);
         int str_i = rand_val % strs.size();
         int head_i = rand_val % heads.size();
         int name_i = rand_val % names.size();
+        qDebug() << "adding friend item : " <<  var;
 
-        // 生成一年内的随机时间
-        QDateTime now = QDateTime::currentDateTime();
-        int randomDays = QRandomGenerator::global()->bounded(365);      // 随机0到364天
-        int randomSeconds = QRandomGenerator::global()->bounded(86400); // 随机一天中的秒数
-        QDateTime randomTime = now.addDays(-randomDays).addSecs(-randomSeconds);
+        // QListWidget的item
+        auto* chat_user_item = new ChatUserItem();
+        auto user_info = std::make_shared<UserInfo>(
+            0, names[name_i],names[name_i],
+            heads[head_i], 0, strs[str_i]);
+        chat_user_item->SetInfo(user_info);
 
-        auto *model = static_cast<ChatUserListModel *>(ui->chatting_list->model());
-        model->AddChatUser(names[name_i], heads[head_i], strs[str_i], randomTime);
+        QListWidgetItem* item = new QListWidgetItem();
+        item->setSizeHint(chat_user_item->sizeHint());
+        // 一定要先添加Item再替换Widget，否则无法显示自定义widget
+        ui->chatting_list->addItem(item);
+        ui->chatting_list->setItemWidget(item, chat_user_item);
     }
 }
 
@@ -159,33 +167,15 @@ void ChatDialog::handleGlobalMousePress(QMouseEvent *event)
 
 void ChatDialog::slot_loading_chat_user()
 {
-    if (b_loading_)
-    {
-        return;
-    }
+    // if (b_loading_)
+    // {
+    //     return;
+    // }
 
     qDebug() << "loading users ...";
     // 添加加载动画
-    b_loading_ = true;
-
-    std::vector<ChatUser> users;
-    for (int var = 0; var < 5; ++var)
-    {
-        int rand_val = QRandomGenerator::global()->bounded(100);
-        int str_i = rand_val % strs.size();
-        int head_i = rand_val % heads.size();
-        int name_i = rand_val % names.size();
-        ChatUser u;
-        u.name = names[name_i];
-        u.head = heads[head_i];
-        u.msg = strs[str_i];
-        u.lastMsgTime = QDateTime::currentDateTime();
-        users.push_back(u);
-    }
-    auto *model = static_cast<ChatUserListModel *>(ui->chatting_list->model());
-    model->AddChatUsers(users.cbegin(), users.cend());
-
-    b_loading_ = false;
+    // b_loading_ = true;
+    // b_loading_ = false;
 }
 
 void ChatDialog::slot_search_text_changed(const QString &text)

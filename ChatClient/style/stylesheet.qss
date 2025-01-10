@@ -697,12 +697,12 @@ ApplyFriendItem #addBtn[state='press'] {
     font-family: "Microsoft YaHei";
 }
 
-#user_name_lb {
+/* #user_name_lb {
     color: rgb(0, 0, 0);
     font-size: 16px;
     font-weight: normal;
     font-family: "Microsoft YaHei";
-}
+} */
 
 /* 认证失败弹窗 */
 #FindFailDlg {

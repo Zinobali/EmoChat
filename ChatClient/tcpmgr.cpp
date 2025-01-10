@@ -57,6 +57,12 @@ void TcpMgr::initHandlers()
     // 好友申请通知
     handlers_.insert(RequestId::ID_NOTIFY_ADD_FRIEND_REQ, [this](RequestId id, QByteArray data)
                      { handleAddFriendReq(id, data); });
+    // 好友申请认证
+    handlers_.insert(RequestId::ID_NOTIFY_AUTH_FRIEND_REQ, [this](RequestId id, QByteArray data)
+                     { handleNotifyAuthFriendReq(id, data); });
+    // 认证好友回包
+    handlers_.insert(RequestId::ID_AUTH_FRIEND_RSP, [this](RequestId id, QByteArray data)
+                     { handleAuthFriendRsp(id, data); });
 }
 
 void TcpMgr::handleRead()
@@ -215,8 +221,7 @@ void TcpMgr::handleAddFriendReq(RequestId id, QByteArray data)
     ErrorCodes error;
     if (!checkErrorCode(jsonObj, error))
     {
-        qDebug() << "handle add friend request Failed, err is "
-                 << jsonObj["error"].toInt();
+        qDebug() << "handle add friend request Failed, err is " << jsonObj["error"].toInt();
         return;
     }
 
@@ -232,6 +237,62 @@ void TcpMgr::handleAddFriendReq(RequestId id, QByteArray data)
     emit sig_friend_apply(apply_info);
 
     qDebug() << "Add Friend Success";
+}
+
+void TcpMgr::handleNotifyAuthFriendReq(RequestId id, QByteArray data)
+{
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
+    {
+        qDebug() << "handle auth friend request Failed, failed to parse json.";
+        return;
+    }
+
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
+    {
+        qDebug() << "handle auth friend request Failed, err is " << jsonObj["error"].toInt();
+        return;
+    }
+
+    int from_uid = jsonObj["fromuid"].toInt();
+    QString name = jsonObj["name"].toString();
+    QString nick = jsonObj["nick"].toString();
+    QString icon = jsonObj["icon"].toString();
+    int sex = jsonObj["sex"].toInt();
+
+    auto auth_info = std::make_shared<AuthInfo>(from_uid, name, nick, icon, sex);
+    emit sig_add_auth_friend(auth_info);
+}
+
+void TcpMgr::handleAuthFriendRsp(RequestId id, QByteArray data)
+{
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
+    {
+        qDebug() << "handle auth friend response Failed, failed to parse json.";
+        return;
+    }
+
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
+    {
+        qDebug() << "handle auth friend response Failed, err is " << jsonObj["error"].toInt();
+        return;
+    }
+
+    auto name = jsonObj["name"].toString();
+    auto nick = jsonObj["nick"].toString();
+    auto icon = jsonObj["icon"].toString();
+    auto sex = jsonObj["sex"].toInt();
+    auto uid = jsonObj["uid"].toInt();
+
+    auto auth_rsp = std::make_shared<AuthRsp>(uid, name, nick, icon, sex);
+    emit sig_auth_rsp(auth_rsp);
 }
 
 bool TcpMgr::parseJson(const QByteArray &data, QJsonObject &obj)

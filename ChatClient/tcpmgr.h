@@ -35,6 +35,8 @@ private:
     void handleSearchUserRsp(RequestId id, QByteArray data);
     void handleAddFriendRsp(RequestId id, QByteArray data);
     void handleAddFriendReq(RequestId id, QByteArray data);
+    void handleNotifyAuthFriendReq(RequestId id, QByteArray data);
+    void handleAuthFriendRsp(RequestId id, QByteArray data);
 
 private:
     QTcpSocket socket_;
@@ -56,8 +58,9 @@ signals:
     void sig_login_failed(ErrorCodes err);
     void sig_switch_chatdlg();
     void sig_user_search(std::shared_ptr<SearchInfo>);
-    void sig_auth_rsp(std::shared_ptr<AuthRsp>);
     void sig_friend_apply(std::shared_ptr<AddFriendApply>);
+    void sig_add_auth_friend(std::shared_ptr<AuthInfo>);
+    void sig_auth_rsp(std::shared_ptr<AuthRsp>);
 };
 
 #endif // TCPMGR_H
