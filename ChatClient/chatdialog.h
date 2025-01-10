@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include "userdata.h"
+#include <QMap>
+#include <QListWidgetItem>
 
 enum ChatUIMode
 {
@@ -47,6 +49,8 @@ private slots:
 
 public slots:
     void slot_friend_apply(std::shared_ptr<AddFriendApply> apply); // 收到好友申请消息
+    void slot_add_auth_firend(std::shared_ptr<AuthInfo> auth_info);
+    void slot_auth_rsp(std::shared_ptr<AuthRsp> auth_rsp);
 
 private:
     Ui::ChatDialog *ui;
@@ -55,6 +59,7 @@ private:
     bool b_loading_;
     QList<StateWidget *> label_list_;
     QWidget *last_widget_;
+    QMap<int, QListWidgetItem*> chat_items_map_;
 };
 
 #endif // CHATDIALOG_H

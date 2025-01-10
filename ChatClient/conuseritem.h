@@ -17,8 +17,8 @@ public:
     explicit ConUserItem(QWidget *parent = nullptr);
     ~ConUserItem();
     virtual QSize sizeHint() const override;
-    // void SetInfo(std::shared_ptr<AuthInfo> auth_info);
-    // void SetInfo(std::shared_ptr<AuthRsp> auth_rsp);
+    void SetInfo(std::shared_ptr<AuthInfo> auth_info);
+    void SetInfo(std::shared_ptr<AuthRsp> auth_rsp);
     void SetInfo(int uid, QString name, QString icon);
     void ShowRedPoint(bool show = true);
 

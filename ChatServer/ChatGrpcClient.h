@@ -27,7 +27,7 @@ class ChatGrpcClient : public Singleton<ChatGrpcClient>
     typedef GrpcConnPool<typename ChatService> ChatConnPool;
 public:
     AddFriendRsp NotifyAddFriend(std::string server_ip, const AddFriendReq& request);
-    //AuthFriendRsp NotifyAuthFriend(std::string server_ip, const AuthFriendReq& request);
+    AuthFriendRsp NotifyAuthFriend(std::string server_ip, const AuthFriendReq& request);
     //TextChatMsgRsp NotifyTextChatMsg(std::string server_ip, const TextChatMsgReq& request, const Json::Value& rtvalue);
 
 private:

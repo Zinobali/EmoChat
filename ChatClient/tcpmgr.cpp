@@ -205,6 +205,8 @@ void TcpMgr::handleAddFriendRsp(RequestId id, QByteArray data)
     }
 
     qDebug() << "Add Friend Success";
+    // todo ... 添加自己的申请记录到好友申请页面（ApplyFriendPage）
+
 }
 
 void TcpMgr::handleAddFriendReq(RequestId id, QByteArray data)

@@ -6,6 +6,8 @@
 #include "grouptipitem.h"
 #include <QListWidgetItem>
 #include "global.h"
+#include "tcpmgr.h"
+#include "usermgr.h"
 
 ContactsList::ContactsList(QWidget *parent)
     : QListWidget(parent)
@@ -17,6 +19,10 @@ ContactsList::ContactsList(QWidget *parent)
     // 模拟后端联系人列表
     addContactUserList();
     connect(this, &ContactsList::itemClicked, this, &ContactsList::slot_item_clicked);
+    // 连接对端同意好友认证后的通知信号
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_add_auth_friend, this, &ContactsList::slot_add_auth_firend);
+    // 连接自己同意好友认证后刷新界面
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_auth_rsp, this, &ContactsList::slot_auth_rsp);
 }
 
 void ContactsList::ShowRedPoint(bool bshow)
@@ -143,4 +149,44 @@ void ContactsList::slot_item_clicked(QListWidgetItem *item)
         qDebug() << "slot invalid item clicked ";
         break;
     }
+}
+
+void ContactsList::slot_add_auth_firend(std::shared_ptr<AuthInfo> auth_info)
+{
+    auto isExist = UserMgr::GetInstance()->CheckFriendById(auth_info->_uid);
+    if (isExist)
+    {
+        return;
+    }
+
+    auto *con_user_wid = new ConUserItem();
+    con_user_wid->SetInfo(auth_info);
+    QListWidgetItem *item = new QListWidgetItem;
+    item->setSizeHint(con_user_wid->sizeHint());
+
+    // 获取联系人分组的行号
+    int index = row(_groupitem);
+    // 插到分组的第一行
+    this->insertItem(index + 1, item);
+    this->setItemWidget(item, con_user_wid); // 最后setItemWidget
+}
+
+void ContactsList::slot_auth_rsp(std::shared_ptr<AuthRsp> auth_rsp)
+{
+    auto isExist = UserMgr::GetInstance()->CheckFriendById(auth_rsp->_uid);
+    if (isExist)
+    {
+        return;
+    }
+
+    auto *con_user_wid = new ConUserItem();
+    con_user_wid->SetInfo(auth_rsp);
+    QListWidgetItem *item = new QListWidgetItem;
+    item->setSizeHint(con_user_wid->sizeHint());
+
+    // 获取联系人分组的行号
+    int index = row(_groupitem);
+    // 插到分组的第一行
+    this->insertItem(index + 1, item);
+    this->setItemWidget(item, con_user_wid); // 最后setItemWidget
 }

@@ -41,6 +41,7 @@ private:
     void RegisterHandlers();
     void LoginHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
     void HandleMsg();
+    bool GetLatestBaseInfo(const std::string& base_key, int uid, std::shared_ptr<UserInfo>& userinfo);
     bool GetBaseInfo(const std::string& base_key, int uid, std::shared_ptr<UserInfo>& userinfo);
     void SearchUserHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
     bool IsPureDigit(const std::string& str);
@@ -48,6 +49,7 @@ private:
     void GetUserByName(const std::string& str, Json::Value& return_value);
     void AddFriendApplyHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
     bool GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list);
+    void AuthFriendApplyHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
 
 private:
     std::thread worker_thread_;

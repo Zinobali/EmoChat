@@ -30,6 +30,10 @@ public:
     std::vector<std::shared_ptr<FriendInfo>> friend_list() const; // 返回好友列表
     void AppendApplyList(QJsonArray apply_array);
 
+    void AddFriend(std::shared_ptr<AuthInfo> auth_info);
+    void AddFriend(std::shared_ptr<AuthRsp> auth_rsp);
+    std::shared_ptr<FriendInfo> GetFriendById(int uid);
+
 private:
     explicit UserMgr();
 

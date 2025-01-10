@@ -62,7 +62,6 @@ void MainWindow::SlotSwitchLogin(QWidget* w)
 
 void MainWindow::SlotSwitchChat()
 {
-    // todo 切换到登录页面
     _chat_dlg = new ChatDialog(this);
     setCentralWidget(_chat_dlg);
     _chat_dlg->show();

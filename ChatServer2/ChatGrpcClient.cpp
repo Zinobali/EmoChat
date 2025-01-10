@@ -31,6 +31,35 @@ AddFriendRsp ChatGrpcClient::NotifyAddFriend(std::string server_ip, const AddFri
     return response;
 }
 
+AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(std::string server_ip, const AuthFriendReq& request) {
+    AuthFriendRsp response;
+    response.set_error(ErrorCodes::Success);
+    Defer defer([&response, &request]() {
+        response.set_from_uid(request.from_uid());
+        response.set_to_uid(request.to_uid());
+        });
+
+    auto find_iter = pools_.find(server_ip);
+    if (find_iter == pools_.end()) {
+        return response;
+    }
+
+    auto& pool = find_iter->second;
+    ClientContext context;
+    auto stub = pool->GetConnection();
+    Defer release_conn([&pool, &stub]() {
+        pool->ReleaseConnection(std::move(stub));
+        });
+
+    Status status = stub->NotifyAuthFriend(&context, request, &response);
+    if (!status.ok()) {
+        response.set_error(ErrorCodes::RPCFailed);
+        return response;
+    }
+
+    return response;
+}
+
 ChatGrpcClient::ChatGrpcClient() {
     auto& config = ConfigMgr::GetInstance();
     auto server_list = config["PeerServer"]["Servers"];

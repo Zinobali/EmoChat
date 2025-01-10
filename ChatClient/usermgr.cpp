@@ -7,8 +7,7 @@ UserMgr::UserMgr()
 
 bool UserMgr::CheckFriendById(int uid)
 {
-    // todo ...
-    return false;
+    return friend_map_.find(uid) != friend_map_.end();
 }
 
 std::vector<std::shared_ptr<ApplyInfo>> UserMgr::apply_list() const
@@ -65,6 +64,29 @@ void UserMgr::AppendApplyList(QJsonArray apply_array)
         auto apply_info = std::make_shared<ApplyInfo>(uid, name, desc, icon, nick, sex, status);
         AddApplyList(apply_info);
     }
+}
+
+void UserMgr::AddFriend(std::shared_ptr<AuthInfo> auth_info)
+{
+    auto friend_info = std::make_shared<FriendInfo>(auth_info);
+    friend_map_.insert(friend_info->_uid, friend_info);
+}
+
+void UserMgr::AddFriend(std::shared_ptr<AuthRsp> auth_rsp)
+{
+    auto friend_info = std::make_shared<FriendInfo>(auth_rsp);
+    friend_map_.insert(friend_info->_uid, friend_info);
+}
+
+std::shared_ptr<FriendInfo> UserMgr::GetFriendById(int uid)
+{
+    auto iter = friend_map_.find(uid);
+    if (iter == friend_map_.end())
+    {
+        return nullptr;
+    }
+
+    return iter.value();
 }
 
 UserMgr::~UserMgr()

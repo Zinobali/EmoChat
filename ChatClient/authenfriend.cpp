@@ -193,7 +193,6 @@ void AuthenFriend::resetLabels()
     auto label_height = 0;
     for (auto iter = _friend_labels.begin(); iter != _friend_labels.end(); iter++)
     {
-        // todo... 添加宽度统计
         if (_label_point.x() + iter.value()->width() > max_width)
         {
             _label_point.setY(_label_point.y() + iter.value()->height() + 6);
@@ -236,7 +235,6 @@ void AuthenFriend::addLabel(QString name)
     tmplabel->setObjectName("FriendLabel");
 
     auto max_width = ui->gridWidget->width();
-    // todo... 添加宽度统计
     if (_label_point.x() + tmplabel->width() > max_width)
     {
         _label_point.setY(_label_point.y() + tmplabel->height() + 6);
@@ -447,7 +445,7 @@ void AuthenFriend::SlotApplySure()
     QByteArray data = doc.toJson(QJsonDocument::Compact);
 
     // 发送验证请求给服务器
-    emit TcpMgr::GetInstance() -> sig_send_data(RequestId::ID_AUTH_FRIEND_REQ, data);
+    emit TcpMgr::GetInstance()->sig_send_data(RequestId::ID_AUTH_FRIEND_REQ, data);
 
     this->hide();
     deleteLater();

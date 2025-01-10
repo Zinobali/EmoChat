@@ -412,6 +412,100 @@ bool MySQLDao::GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyI
     }
 }
 
+bool MySQLDao::AuthFriendApply(int from_id, int to_id, const std::string& back_name) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
+
+    try {
+        conn->startTransaction();
+        auto emo_chat = conn->getSchema(schema_);
+        auto friend_apply_table = emo_chat.getTable("friend_apply");
+        // 更新friend_apply的认证状态
+        auto result1 = friend_apply_table.update()
+            .set("status", 1)
+            .where("from_uid = :from_uid AND to_uid = :to_uid")
+            // 将from_uid和to_uid交换位置
+            .bind("from_uid", to_id)
+            .bind("to_uid", from_id)
+            .execute();
+        if (result1.getAffectedItemsCount() == 0) {
+            conn->rollback();
+            return false;
+        }
+
+        // 将好友关系插入到friend表中
+        // 选择数据库
+        conn->sql("USE " + schema_).execute();
+        // 准备SQL语句
+        auto stmt = conn->sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?) ");
+        auto result2 = stmt.bind(from_id, to_id, back_name).execute();
+        if (result2.getAffectedItemsCount() < 0) {
+            conn->rollback();
+            return false;
+        }
+
+        conn->commit();
+        return true;
+
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query in MySQLDao::AuthFriendApply: " << err.what() << std::endl;
+        return false;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::AuthFriendApply: " << ex.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::AuthFriendApply: " << std::endl;
+        return false;
+    }
+}
+
+bool MySQLDao::AddFriend(int from_id, int to_id, const std::string& back_name) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
+
+    try {
+        conn->startTransaction();
+        // 将好友关系插入到friend表中
+        // 选择数据库
+        conn->sql("USE " + schema_).execute();
+        // 准备SQL语句
+        auto stmt1 = conn->sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?) ");
+        auto result1 = stmt1.bind(from_id, to_id, back_name).execute();
+        if (result1.getAffectedItemsCount() < 0) {
+            conn->rollback();
+            return false;
+        }
+
+        auto stmt2 = conn->sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?) ");
+        auto result2 = stmt2.bind(to_id, from_id, back_name).execute();
+        if (result2.getAffectedItemsCount() < 0) {
+            conn->rollback();
+            return false;
+        }
+
+        conn->commit();
+        return true;
+
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query in MySQLDao::AddFriend: " << err.what() << std::endl;
+        return false;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::AddFriend: " << ex.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::AddFriend: " << std::endl;
+        return false;
+    }
+}
+
 int MySQLMgr::RegUser(const std::string& name, const std::string& email, const std::string& pwd) {
     return dao_.RegisterUser(name, email, pwd);
 }
@@ -450,4 +544,12 @@ bool MySQLMgr::AddFriendApply(int from_id, int to_id) {
 
 bool MySQLMgr::GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list, int offset, int limit) {
     return dao_.GetFriendApplyInfo(to_uid, apply_list, offset, limit);
+}
+
+bool MySQLMgr::AuthFriendApply(int from_id, int to_id, const std::string& back_name) {
+    return dao_.AuthFriendApply(from_id, to_id, back_name);
+}
+
+bool MySQLMgr::AddFriend(int from_id, int to_id, const std::string& back_name) {
+    return dao_.AddFriend(from_id, to_id, back_name);
 }
