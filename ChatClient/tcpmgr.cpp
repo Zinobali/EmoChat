@@ -120,9 +120,22 @@ void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
         return;
     }
 
-    UserMgr::GetInstance()->setUid(jsonObj["uid"].toInt());
-    UserMgr::GetInstance()->setName(jsonObj["name"].toString());
-    UserMgr::GetInstance()->setToken(jsonObj["token"].toString());
+    auto uid = jsonObj["uid"].toInt();
+    auto name = jsonObj["name"].toString();
+    auto email = jsonObj["email"].toString();
+    auto nick = jsonObj["nick"].toString();
+    auto sex = jsonObj["sex"].toInt();
+    auto desc = jsonObj["desc"].toString();
+    auto icon = jsonObj["icon"].toString();
+    auto token = jsonObj["token"].toString();
+    auto user_info = std::make_shared<UserInfo>(uid, name, nick, icon, sex);
+    UserMgr::GetInstance()->SetUserInfo(user_info);
+    UserMgr::GetInstance()->setToken(token);
+    if (jsonObj.contains("apply_list"))
+    {
+        UserMgr::GetInstance()->AppendApplyList(jsonObj["apply_list"].toArray());
+    }
+
     emit sig_switch_chatdlg();
 }
 
@@ -158,6 +171,7 @@ void TcpMgr::handleSearchUserRsp(RequestId id, QByteArray data)
         return;
     }
 
+    // 搜索到的用户信息
     auto search_info = std::make_shared<SearchInfo>(
         jsonObj["uid"].toInt(), jsonObj["name"].toString(),
         jsonObj["nick"].toString(), jsonObj["desc"].toString(),

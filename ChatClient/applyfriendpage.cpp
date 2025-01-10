@@ -4,6 +4,7 @@
 #include <QRandomGenerator>
 #include "usermgr.h"
 #include <QPainter>
+#include "authenfriend.h"
 
 ApplyFriendPage::ApplyFriendPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::ApplyFriendPage)
@@ -35,13 +36,12 @@ void ApplyFriendPage::AddNewApply(std::shared_ptr<AddFriendApply> apply)
     ui->apply_friend_list->insertItem(0, item); // 插入到最前面
     ui->apply_friend_list->setItemWidget(item, apply_item);
     apply_item->ShowAddBtn(true);
-    connect(apply_item, &ApplyFriendItem::sig_auth_friend, [this](std::shared_ptr<ApplyInfo> apply_info)
-            {
-                //        auto* authFriend = new AuthenFriend(this);
-                //        authFriend->setModal(true);
-                //        authFriend->SetApplyInfo(apply_info);
-                //        authFriend->show();
-            });
+    connect(apply_item, &ApplyFriendItem::sig_auth_friend, [this](std::shared_ptr<ApplyInfo> apply_info) {
+        auto* authFriend = new AuthenFriend(this);
+        authFriend->setModal(true);
+        authFriend->SetApplyInfo(apply_info);
+        authFriend->show();
+    });
 }
 
 void ApplyFriendPage::paintEvent(QPaintEvent *event)
@@ -81,10 +81,10 @@ void ApplyFriendPage::loadApplyList()
         }
         connect(apply_item, &ApplyFriendItem::sig_auth_friend, [this](std::shared_ptr<ApplyInfo> apply_info)
                 {
-                    //            auto* authFriend = new AuthenFriend(this);
-                    //            authFriend->setModal(true);
-                    //            authFriend->SetApplyInfo(apply_info);
-                    //            authFriend->show();
+                    auto* authFriend = new AuthenFriend(this);
+                    authFriend->setModal(true);
+                    authFriend->SetApplyInfo(apply_info);
+                    authFriend->show();
                 });
     }
 
@@ -106,10 +106,10 @@ void ApplyFriendPage::loadApplyList()
         ui->apply_friend_list->setItemWidget(item, apply_item);
         connect(apply_item, &ApplyFriendItem::sig_auth_friend, [this](std::shared_ptr<ApplyInfo> apply_info)
                 {
-                    //            auto *authFriend =  new AuthenFriend(this);
-                    //            authFriend->setModal(true);
-                    //            authFriend->SetApplyInfo(apply_info);
-                    //            authFriend->show();
+                    auto *authFriend =  new AuthenFriend(this);
+                    authFriend->setModal(true);
+                    authFriend->SetApplyInfo(apply_info);
+                    authFriend->show();
                 });
     }
 }

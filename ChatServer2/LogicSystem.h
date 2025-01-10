@@ -10,6 +10,7 @@
 #include <json/json.h>
 #include <json/value.h>
 #include <json/reader.h>
+#include "data.h"
 
 class LogicNode
 {
@@ -46,6 +47,7 @@ private:
     void GetUserByUid(const std::string& str, Json::Value& return_value);
     void GetUserByName(const std::string& str, Json::Value& return_value);
     void AddFriendApplyHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
+    bool GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list);
 
 private:
     std::thread worker_thread_;

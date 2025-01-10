@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include "singleton.h"
-
-class FriendInfo;
-class ApplyInfo;
+#include <QHash>
+#include <QMap>
+#include <vector>
+#include "userdata.h"
+#include <QJsonArray>
 
 class UserMgr : public QObject, public Singleton<UserMgr>, public std::enable_shared_from_this<UserMgr>
 {
@@ -20,23 +22,23 @@ public:
     void setName(const QString &newName);
     QString token() const;
     void setToken(const QString &newToken);
-
-    std::vector<std::shared_ptr<ApplyInfo>> apply_list() const;
-    void setApply_list(const std::vector<std::shared_ptr<ApplyInfo>> &newApply_list);
-    std::vector<std::shared_ptr<FriendInfo>> friend_list() const;
-    void setFriend_list(const std::vector<std::shared_ptr<FriendInfo>> &newFriend_list);
-    bool CheckFriendById(int uid); // 判断是否为好友
+    bool CheckFriendById(int uid);                       // 判断是否为好友
+    bool AlreadyApply(int uid);                          // 判断是否已经在 申请列表中
+    void AddApplyList(std::shared_ptr<ApplyInfo> apply); // 添加单个好友申请
+    void SetUserInfo(const std::shared_ptr<UserInfo> &user_info);
+    std::vector<std::shared_ptr<ApplyInfo>> apply_list() const;   // 返回好友申请列表
+    std::vector<std::shared_ptr<FriendInfo>> friend_list() const; // 返回好友列表
+    void AppendApplyList(QJsonArray apply_array);
 
 private:
     explicit UserMgr();
-    void test_function(); // 测试函数，后续删除
 
 private:
-    int uid_;
-    QString name_;
+    std::shared_ptr<UserInfo> user_info_;
     QString token_;
-    std::vector<std::shared_ptr<ApplyInfo>> apply_list_;   // 好友申请列表
-    std::vector<std::shared_ptr<FriendInfo>> friend_list_; // 好友列表
+
+    QMap<int, std::shared_ptr<ApplyInfo>> apply_map_;   // 好友申请列表
+    QMap<int, std::shared_ptr<FriendInfo>> friend_map_; // 好友列表
 
 signals:
 };

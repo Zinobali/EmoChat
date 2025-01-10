@@ -62,6 +62,7 @@ bool ContactsList::eventFilter(QObject *watched, QEvent *event)
 
 void ContactsList::addContactUserList()
 {
+    // 新的朋友分组
     auto *groupTip = new GroupTipItem();
     QListWidgetItem *item = new QListWidgetItem();
     item->setSizeHint(groupTip->sizeHint());
@@ -81,7 +82,7 @@ void ContactsList::addContactUserList()
     // 默认设置新的朋友申请条目被选中
     this->setCurrentItem(add_item);
 
-    // 第二组
+    // 联系人分组
     auto *groupCon = new GroupTipItem();
     groupCon->SetGroupTip(tr("联系人"));
     _groupitem = new QListWidgetItem();

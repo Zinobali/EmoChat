@@ -4,7 +4,6 @@
 #include "StatusGrpcClient.h"
 #include "RedisMgr.h"
 #include "MySQLMgr.h"
-#include "data.h"
 #include "ConfigMgr.h"
 #include "UserMgr.h"
 #include <regex>
@@ -109,8 +108,9 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t
     return_value["sex"] = user_info->sex;
     return_value["icon"] = user_info->icon;
 
+
     // 从数据库获取申请列表
-    /*std::vector<std::shared_ptr<ApplyInfo>> apply_list;
+    std::vector<std::shared_ptr<ApplyInfo>> apply_list;
     bool apply_ok = GetFriendApplyInfo(uid, apply_list);
     if (apply_ok) {
         for (auto& apply : apply_list) {
@@ -124,7 +124,7 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t
             apply_value["status"] = apply->_status;
             return_value["apply_list"].append(apply_value);
         }
-    }*/
+    }
 
     // 获取好友列表
     /*std::vector < std::shared_ptr <UserInfo>> friend_list;
@@ -409,4 +409,9 @@ void LogicSystem::AddFriendApplyHandler(std::shared_ptr<CSession> session, const
     }
 
     ChatGrpcClient::GetInstance()->NotifyAddFriend(to_ip_value, add_request);
+}
+
+bool LogicSystem::GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list) {
+    // 获取数据库中的申请信息
+    return MySQLMgr::GetInstance()->GetFriendApplyInfo(to_uid, apply_list, 0, 10);
 }

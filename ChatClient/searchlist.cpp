@@ -155,7 +155,7 @@ void SearchList::slot_item_clicked(QListWidgetItem *item)
         }
         waitPending(true);
         auto search_edit = dynamic_cast<CustomizeEdit *>(_search_edit);
-        auto uid_str = search_edit->text();
+        auto uid_str = search_edit->text(); // 搜索框的文本，可以是uid或name
 
         // 准备发送搜索用户请求
         QJsonObject req_obj;
@@ -184,8 +184,9 @@ void SearchList::slot_item_clicked(QListWidgetItem *item)
 void SearchList::slot_user_search(std::shared_ptr<SearchInfo> si)
 {
     waitPending(false);
-    Defer show([this]()
-               { _find_dlg->show(); });
+    Defer show([this]() {
+        _find_dlg->show();
+    });
     if (si == nullptr)
     {
         qDebug() << "user not found";
@@ -193,6 +194,7 @@ void SearchList::slot_user_search(std::shared_ptr<SearchInfo> si)
         return;
     }
 
+    // 检查是不是自己
     auto self_uid = UserMgr::GetInstance()->uid();
     if (si->_uid == self_uid)
     {
@@ -201,6 +203,7 @@ void SearchList::slot_user_search(std::shared_ptr<SearchInfo> si)
         return;
     }
 
+    // 检查是否已经在好友列表
     bool exist = UserMgr::GetInstance()->CheckFriendById(si->_uid);
     if (exist)
     {
@@ -210,6 +213,7 @@ void SearchList::slot_user_search(std::shared_ptr<SearchInfo> si)
         return;
     }
 
+    // 准备弹窗信息
     _find_dlg = std::make_shared<FindSuccessDlg>();
     std::static_pointer_cast<FindSuccessDlg>(_find_dlg)->SetSearchInfo(si);
 }

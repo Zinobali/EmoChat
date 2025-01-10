@@ -361,6 +361,57 @@ bool MySQLDao::AddFriendApply(int from_id, int to_id) {
     }
 }
 
+bool MySQLDao::GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list, int offset, int limit) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
+
+    try {
+        // 选择数据库
+        conn->sql("USE " + schema_).execute();
+        // 准备SQL语句
+        auto stmt = conn->sql(
+            "SELECT apply.from_uid, apply.status, user.name, user.nick, user.sex "
+            "FROM friend_apply AS apply "
+            "JOIN user ON apply.from_uid = user.uid "
+            "WHERE apply.to_uid = ? AND apply.id > ? "
+            "ORDER BY apply.id ASC LIMIT ?");
+        // 绑定参数
+        stmt.bind(to_uid).bind(offset).bind(limit);
+        // 执行查询
+        auto result = stmt.execute();
+        if (result.count() == 0) {
+            std::cout << "No friend apply found." << std::endl;
+            return false;
+        }
+
+        // 遍历结果集
+        for (auto row : result) {
+            auto uid = row[0].isNull() ? 0 : row[0].get<int>();
+            auto status = row[1].isNull() ? 0 : row[1].get<int>();
+            auto name = row[2].isNull() ? "" : row[2].get<std::string>();
+            auto nick = row[3].isNull() ? "" : row[3].get<std::string>();
+            auto sex = row[4].isNull() ? 0 : row[4].get<int>();
+            auto apply_info = std::make_shared<ApplyInfo>(uid, name, "", "", nick, sex, status);
+            apply_list.push_back(apply_info);
+        }
+        return true;
+
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query in MySQLDao::GetFriendApplyInfo: " << err.what() << std::endl;
+        return false;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::GetFriendApplyInfo: " << ex.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::GetFriendApplyInfo: " << std::endl;
+        return false;
+    }
+}
+
 int MySQLMgr::RegUser(const std::string& name, const std::string& email, const std::string& pwd) {
     return dao_.RegisterUser(name, email, pwd);
 }
@@ -395,4 +446,8 @@ std::shared_ptr<UserInfo> MySQLMgr::GetUser(const std::string& name) {
 
 bool MySQLMgr::AddFriendApply(int from_id, int to_id) {
     return dao_.AddFriendApply(from_id, to_id);
+}
+
+bool MySQLMgr::GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list, int offset, int limit) {
+    return dao_.GetFriendApplyInfo(to_uid, apply_list, offset, limit);
 }

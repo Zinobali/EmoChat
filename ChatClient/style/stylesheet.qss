@@ -528,66 +528,48 @@ QScrollBar::sub-page:vertical {
     background: #f0f0f0;
     color: #2cb46e;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
 }
 
 #apply_sure_wid #sure_btn[state='hover'] {
     background: #d2d2d2;
     color: #2cb46e;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
 }
 
 #apply_sure_wid #sure_btn[state='press'] {
     background: #c6c6c6;
     color: #2cb46e;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
 }
 
 #apply_sure_wid #cancel_btn[state='normal'] {
     background: #f0f0f0;
     color: #2e2f30;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
 }
 
 #apply_sure_wid #cancel_btn[state='hover'] {
     background: #d2d2d2;
     color: #2e2f30;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
 }
 
 #apply_sure_wid #cancel_btn[state='press'] {
     background: #c6c6c6;
     color: #2e2f30;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
 }
 
 /* 查找好友对话框关闭按钮 */
@@ -679,42 +661,34 @@ ApplyFriendItem {
 ApplyFriendItem #user_chat_lb {
     color: #a2a2a2;
     font-size: 14px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
 }
 
 ApplyFriendItem #addBtn[state='normal'] {
     background-color: #d3d7d4;
     color: #2cb46e;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
+
 }
 
 ApplyFriendItem #addBtn[state='hover'] {
     background-color: #D3D3D3;
     color: #2cb46e;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
+
 }
 
 ApplyFriendItem #addBtn[state='press'] {
     background-color: #BEBEBE;
     color: #2cb46e;
     font-size: 16px;
-    /* 设置字体大小 */
     font-family: "Microsoft YaHei";
-    /* 设置字体 */
     border-radius: 20px;
-    /* 设置圆角 */
+
 }
 
 #already_add_lb {
@@ -728,4 +702,49 @@ ApplyFriendItem #addBtn[state='press'] {
     font-size: 16px;
     font-weight: normal;
     font-family: "Microsoft YaHei";
+}
+
+/* 认证失败弹窗 */
+#FindFailDlg {
+    background-color: #ffffff;
+}
+
+#fail_tip,
+#fail_tip2 {
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+}
+
+#fail_sure_btn[state='normal'] {
+    background: #07c160;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+    border-radius: 20px;
+
+}
+
+#fail_sure_btn[state='hover'] {
+    background: #3bbb4b;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+    border-radius: 20px;
+
+}
+
+#fail_sure_btn[state='press'] {
+    background: #07c160;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+    border-radius: 20px;
+
+}
+
+/* 好友认证界面 */
+#AuthenFriend {
+    border: 2px solid #f1f1f1;
+    font-size: 14px;
+    background: #f7f7f8;
 }

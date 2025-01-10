@@ -10,6 +10,8 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include "global.h"
+#include "tcpmgr.h"
+#include "usermgr.h"
 
 ChatDialog::ChatDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::ChatDialog), mode_(ChatUIMode::ChatMode), state_(ChatUIMode::ChatMode),
@@ -90,9 +92,6 @@ void ChatDialog::initUI()
     AddLabelGroup(ui->side_contacts_lb);
     // 直接显示聊天页面
     ui->side_chat_lb->SetSelected(true);
-    // slot_side_chat_clicked();
-    // 显示一个红点（测试用）
-    ui->side_chat_lb->ShowRedPoint(true);
     installEventFilter(this);
     // 关联搜索编辑框
     ui->search_list->SetSearchEdit(ui->search_edit);
@@ -104,6 +103,7 @@ void ChatDialog::initSignals()
     connect(ui->side_chat_lb, &StateWidget::clicked, this, &ChatDialog::slot_side_chat_clicked);
     connect(ui->side_contacts_lb, &StateWidget::clicked, this, &ChatDialog::slot_side_contact_clicked);
     connect(ui->search_edit, &QLineEdit::textChanged, this, &ChatDialog::slot_search_text_changed);
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_friend_apply, this, &ChatDialog::slot_friend_apply);
 }
 
 void ChatDialog::addChatUserList()
@@ -228,4 +228,19 @@ void ChatDialog::slot_side_contact_clicked()
     // qDebug() << "stack widget index:" << ui->stackedWidget->currentIndex();
     state_ = ChatUIMode::ContactMode;
     ShowSearch(false);
+}
+
+void ChatDialog::slot_friend_apply(std::shared_ptr<AddFriendApply> apply)
+{
+    // 检查是否已经申请
+    bool is_exist = UserMgr::GetInstance()->AlreadyApply(apply->_from_uid);
+    if (is_exist)
+    {
+        return;
+    }
+
+    UserMgr::GetInstance()->AddApplyList(std::make_shared<ApplyInfo>(apply));
+    ui->side_contacts_lb->ShowRedPoint(true);
+    ui->contacts_list->ShowRedPoint(true);
+    ui->friend_apply_page->AddNewApply(apply);
 }

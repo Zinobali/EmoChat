@@ -2,7 +2,7 @@
 #define CHATDIALOG_H
 
 #include <QDialog>
-#include <vector>
+#include "userdata.h"
 
 enum ChatUIMode
 {
@@ -44,6 +44,9 @@ private slots:
     // void slot_sidebar_widget_clicked(StateWidget *label);
     void slot_side_chat_clicked();
     void slot_side_contact_clicked();
+
+public slots:
+    void slot_friend_apply(std::shared_ptr<AddFriendApply> apply); // 收到好友申请消息
 
 private:
     Ui::ChatDialog *ui;
