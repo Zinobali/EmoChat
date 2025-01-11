@@ -41,9 +41,12 @@ private:
     void handleGlobalMousePress(QMouseEvent *event);
     void setSelectedChatItem(int uid);
     void setSelectedChatPage(int uid);
+    void loadMoreChatUser();
+    void loadMoreContacts();
 
 private slots:
     void slot_loading_chat_user();
+    void slot_loading_contact_user();
     void slot_search_text_changed(const QString &text);
     // void slot_sidebar_widget_clicked(StateWidget *label);
     void slot_side_chat_clicked();

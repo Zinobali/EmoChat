@@ -20,6 +20,7 @@ private:
 private:
     ConUserItem *_add_friend_item;
     QListWidgetItem *_groupitem;
+    bool _load_pending = false;
 
 public slots:
     void slot_item_clicked(QListWidgetItem *item);

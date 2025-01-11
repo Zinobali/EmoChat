@@ -8,6 +8,7 @@
 #include "global.h"
 #include "tcpmgr.h"
 #include "usermgr.h"
+#include <QTimer>
 
 ContactsList::ContactsList(QWidget *parent)
     : QListWidget(parent)
@@ -58,6 +59,21 @@ bool ContactsList::eventFilter(QObject *watched, QEvent *event)
         // int pageSize = 10; // 每页加载的联系人数量
         if (maxScrollValue - currentValue <= 0)
         {
+
+            auto load_finish = UserMgr::GetInstance()->IsContactsLoadFinish();
+            if (load_finish)
+            {
+                return true;
+            }
+
+            if (_load_pending)
+            {
+                return true;
+            }
+
+            _load_pending = true;
+            QTimer::singleShot(100, [this]()
+                               { _load_pending = false; });
             // 发送信号通知聊天界面加载更多聊天内容
             emit sig_loading_contact_user();
         }
@@ -97,6 +113,19 @@ void ContactsList::addContactUserList()
     this->setItemWidget(_groupitem, groupCon);
     _groupitem->setFlags(_groupitem->flags() & ~Qt::ItemIsSelectable);
 
+    // 数据库联系人
+    auto con_list = UserMgr::GetInstance()->GetContactsPerPage();
+    for (auto &con : con_list)
+    {
+        auto *con_user_wid = new ConUserItem();
+        con_user_wid->SetInfo(con->_uid, con->_back, con->_icon);
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setSizeHint(con_user_wid->sizeHint());
+        this->addItem(item);
+        this->setItemWidget(item, con_user_wid);
+    }
+
+    // 假联系人
     for (int i = 0; i < 13; i++)
     {
         int randomValue = QRandomGenerator::global()->bounded(100); // 生成0到99之间的随机整数

@@ -513,6 +513,58 @@ bool MySQLDao::AddFriend(int from_id, int to_id, const std::string& back_name) {
     }
 }
 
+bool MySQLDao::GetFriendList(int self_id, std::vector<std::shared_ptr<UserInfo>>& user_list) {
+    auto conn = pool_->getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get a database connection." << std::endl;
+        return false;
+    }
+    Defer defer([&conn, this]() { pool_->releaseConnection(conn); });
+
+    try {
+        auto emo_chat = conn->getSchema(schema_);
+        auto friend_table = emo_chat.getTable("friend");
+
+        // 查询单向好友关系表
+        auto result = friend_table
+            .select("self_id", "friend_id", "back")
+            .where("self_id = :self_id")
+            .bind("self_id", self_id)
+            .execute();
+        if (result.count() == 0) {
+            return false;
+        }
+
+        // 遍历结果集
+        while (auto row = result.fetchOne()) {
+            auto friend_id = row[1].isNull() ? 0 : row[1].get<int>();
+            auto back_name = row[2].isNull() ? "" : row[2].get<std::string>();
+
+            auto user_info = GetUser(friend_id);
+            if (user_info) {
+                // 设置备注名
+                if (back_name.empty()) {
+                    user_info->back = user_info->name;
+                } else {
+                    user_info->back = back_name;
+                }
+                user_list.push_back(user_info);
+            }
+        }
+        return true;
+
+    } catch (const mysqlx::Error& err) {
+        std::cerr << "Error executing query in MySQLDao::GetFriendList: " << err.what() << std::endl;
+        return false;
+    } catch (const std::exception& ex) {
+        std::cerr << "Standard exception caught in MySQLDao::GetFriendList: " << ex.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in MySQLDao::GetFriendList: " << std::endl;
+        return false;
+    }
+}
+
 int MySQLMgr::RegUser(const std::string& name, const std::string& email, const std::string& pwd) {
     return dao_.RegisterUser(name, email, pwd);
 }
@@ -559,4 +611,8 @@ bool MySQLMgr::AuthFriendApply(int from_id, int to_id, const std::string& back_n
 
 bool MySQLMgr::AddFriend(int from_id, int to_id, const std::string& back_name) {
     return dao_.AddFriend(from_id, to_id, back_name);
+}
+
+bool MySQLMgr::GetFriendList(int self_id, std::vector<std::shared_ptr<UserInfo>>& user_list) {
+    return dao_.GetFriendList(self_id, user_list);
 }

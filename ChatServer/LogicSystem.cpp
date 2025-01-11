@@ -131,7 +131,7 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t
     }
 
     // 获取好友列表
-    /*std::vector < std::shared_ptr <UserInfo>> friend_list;
+    std::vector < std::shared_ptr <UserInfo>> friend_list;
     bool friend_ok = GetFriendList(uid, friend_list);
     if (friend_ok) {
         for (auto& friend_info : friend_list) {
@@ -145,7 +145,7 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t
             friend_value["back"] = friend_info->back;
             return_value["friend_list"].append(friend_value);
         }
-    }*/
+    }
 
     // 增加登录数量
     auto server_name = ConfigMgr::GetInstance()["SelfServer"]["Name"];
@@ -519,4 +519,8 @@ void LogicSystem::AuthFriendApplyHandler(std::shared_ptr<CSession> session, cons
     auth_request.set_to_uid(touid);
 
     ChatGrpcClient::GetInstance()->NotifyAuthFriend(to_ip_value, auth_request);
+}
+
+bool LogicSystem::GetFriendList(int self_id, std::vector<std::shared_ptr<UserInfo>>& user_list) {
+    return MySQLMgr::GetInstance()->GetFriendList(self_id, user_list);
 }

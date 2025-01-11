@@ -44,6 +44,7 @@ public:
     bool GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list, int offset, int limit);
     bool AuthFriendApply(int from_id, int to_id, const std::string& back_name);
     bool AddFriend(int from_id, int to_id, const std::string& back_name);
+    bool GetFriendList(int self_id, std::vector<std::shared_ptr<UserInfo> >& user_list);
 
 private:
     std::string GenerateSalt(); // Éú³ÉÑÎ
@@ -83,6 +84,7 @@ public:
     bool GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list, int offset, int limit);
     bool AuthFriendApply(int from_id, int to_id, const std::string& back_name);
     bool AddFriend(int from_id, int to_id, const std::string& back_name);
+    bool GetFriendList(int self_id, std::vector<std::shared_ptr<UserInfo> >& user_list);
 
 private:
     MySQLMgr() = default;

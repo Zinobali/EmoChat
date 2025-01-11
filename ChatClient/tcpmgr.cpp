@@ -137,9 +137,15 @@ void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
     auto user_info = std::make_shared<UserInfo>(uid, name, nick, icon, sex);
     UserMgr::GetInstance()->SetUserInfo(user_info);
     UserMgr::GetInstance()->setToken(token);
+    // 好友申请列表
     if (jsonObj.contains("apply_list"))
     {
         UserMgr::GetInstance()->AppendApplyList(jsonObj["apply_list"].toArray());
+    }
+    // 好友列表
+    if (jsonObj.contains("friend_list"))
+    {
+        UserMgr::GetInstance()->AppendFriendList(jsonObj["friend_list"].toArray());
     }
 
     emit sig_switch_chatdlg();
@@ -206,7 +212,6 @@ void TcpMgr::handleAddFriendRsp(RequestId id, QByteArray data)
 
     qDebug() << "Add Friend Success";
     // todo ... 添加自己的申请记录到好友申请页面（ApplyFriendPage）
-
 }
 
 void TcpMgr::handleAddFriendReq(RequestId id, QByteArray data)

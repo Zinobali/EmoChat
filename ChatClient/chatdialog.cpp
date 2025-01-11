@@ -111,13 +111,37 @@ void ChatDialog::initSignals()
     connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_auth_rsp, this, &ChatDialog::slot_auth_rsp);
     // 连接聊天跳转信号
     connect(ui->search_list, &SearchList::sig_jump_chat_item, this, &ChatDialog::slot_jump_chat_item);
+    // 联系人滚动条加载更多
+    connect(ui->contacts_list, &ContactsList::sig_loading_contact_user, this, &ChatDialog::slot_loading_contact_user);
 }
 
 void ChatDialog::addChatUserList()
 {
+    // 数据库中的好友列表
+    auto friend_list = UserMgr::GetInstance()->GetChatListPerPage();
+    if (!friend_list.empty())
+    {
+        for (auto &friend_info : friend_list)
+        {
+            auto find_iter = chat_items_map_.find(friend_info->_uid);
+            if (find_iter == chat_items_map_.end())
+            {
+                // 好友未重复
+                auto *chat_user_item = new ChatUserItem();
+                auto user_info = std::make_shared<UserInfo>(friend_info);
+                chat_user_item->SetInfo(user_info);
+                QListWidgetItem *item = new QListWidgetItem();
+                item->setSizeHint(chat_user_item->sizeHint());
+                ui->chatting_list->addItem(item);
+                ui->chatting_list->setItemWidget(item, chat_user_item);
+                chat_items_map_.insert(friend_info->_uid, item);
+            }
+        }
+    }
+
+    // 假数据
     for (int var = 0; var < 13; ++var)
     {
-
         // 生成测试随机好友信息
         int rand_val = QRandomGenerator::global()->bounded(100);
         int str_i = rand_val % strs.size();
@@ -283,17 +307,75 @@ void ChatDialog::setSelectedChatPage(int uid)
     }
 }
 
+void ChatDialog::loadMoreChatUser()
+{
+    auto friend_list = UserMgr::GetInstance()->GetChatListPerPage();
+    if (friend_list.empty())
+    {
+        return;
+    }
+
+    for (auto &friend_info : friend_list)
+    {
+        auto find_iter = chat_items_map_.find(friend_info->_uid);
+        if (find_iter == chat_items_map_.end())
+        {
+            // 好友未重复
+            auto *chat_user_item = new ChatUserItem();
+            auto user_info = std::make_shared<UserInfo>(friend_info);
+            chat_user_item->SetInfo(user_info);
+            QListWidgetItem *item = new QListWidgetItem();
+            item->setSizeHint(chat_user_item->sizeHint());
+            ui->chatting_list->addItem(item);
+            ui->chatting_list->setItemWidget(item, chat_user_item);
+            chat_items_map_.insert(friend_info->_uid, item);
+        }
+    }
+}
+
+void ChatDialog::loadMoreContacts()
+{
+    auto friend_list = UserMgr::GetInstance()->GetContactsPerPage();
+    if (friend_list.empty())
+    {
+        return;
+    }
+
+    for (auto &con : friend_list)
+    {
+        auto *con_user_wid = new ConUserItem();
+        con_user_wid->SetInfo(con->_uid, con->_back, con->_icon);
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setSizeHint(con_user_wid->sizeHint());
+        ui->contacts_list->addItem(item);
+        ui->contacts_list->setItemWidget(item, con_user_wid);
+    }
+}
+
 void ChatDialog::slot_loading_chat_user()
 {
-    // if (b_loading_)
-    // {
-    //     return;
-    // }
+    if (b_loading_)
+    {
+        return;
+    }
 
-    qDebug() << "loading users ...";
-    // 添加加载动画
-    // b_loading_ = true;
-    // b_loading_ = false;
+    b_loading_ = true;
+    // todo ... 设计加载动画
+    loadMoreChatUser();
+    b_loading_ = false;
+}
+
+void ChatDialog::slot_loading_contact_user()
+{
+    if (b_loading_)
+    {
+        return;
+    }
+
+    b_loading_ = true;
+    // todo ... 设计加载动画
+    loadMoreContacts();
+    b_loading_ = false;
 }
 
 void ChatDialog::slot_search_text_changed(const QString &text)

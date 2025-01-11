@@ -13,6 +13,7 @@ struct UserInfo
     std::string desc;
     int sex;
     std::string icon;
+    std::string back;
 };
 
 struct ApplyInfo
