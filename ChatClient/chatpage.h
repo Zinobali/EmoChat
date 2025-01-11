@@ -5,11 +5,13 @@
 #include "userdata.h"
 #include <QMap>
 
+constexpr int MAX_MSG_CONTENT_LEN = 1024;
+
 namespace Ui
 {
 class ChatPage;
 }
-
+struct MsgInfo;
 class ChatPage : public QWidget
 {
     Q_OBJECT
@@ -30,11 +32,14 @@ private:
     void initUI();
     void initSignals();
     void clearItems();
+    void processMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo>& user_info, QJsonArray &textArray, int &txt_size);
+    QWidget *handleTextMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo>& user_info, QJsonArray &textArray, int &txt_size);
+    void sendChatData(int fromUid, int toUid, QJsonArray &textArray);
 
 private:
     Ui::ChatPage *ui;
     std::shared_ptr<UserInfo> _user_info;
-    QMap<QString, QWidget*>  _bubble_map;
+    QMap<QString, QWidget *> _bubble_map;
 
 signals:
     void sig_append_send_chat_msg(std::shared_ptr<TextChatData> msg);

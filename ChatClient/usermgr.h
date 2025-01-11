@@ -45,6 +45,7 @@ public:
     bool IsContactsLoadFinish();
     // void UpdateChatListLoadCount();
     // void UpdateContactsLoadCount();
+    void AppendFriendChatMsg(int friend_id, std::vector<std::shared_ptr<TextChatData>> msgs);
 
 private:
     explicit UserMgr();

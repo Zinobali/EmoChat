@@ -166,6 +166,17 @@ bool UserMgr::IsContactsLoadFinish()
     return contacts_load_count_ >= friend_list_.size();
 }
 
+void UserMgr::AppendFriendChatMsg(int friend_id, std::vector<std::shared_ptr<TextChatData>> msgs)
+{
+    auto find_iter = friend_map_.find(friend_id);
+    if (find_iter == friend_map_.end())
+    {
+        return;
+    }
+
+    find_iter.value()->AppendChatMsgs(msgs);
+}
+
 // void UserMgr::UpdateChatListLoadCount()
 // {
 //     int begin = chat_list_load_count_;

@@ -6,6 +6,10 @@
 #include "textbubble.h"
 #include "picturebubble.h"
 #include "usermgr.h"
+#include <QJsonArray>
+#include <QUuid>
+#include "tcpmgr.h"
+#include <QJsonDocument>
 
 ChatPage::ChatPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::ChatPage)
@@ -23,10 +27,11 @@ ChatPage::~ChatPage()
 void ChatPage::SetUserInfo(std::shared_ptr<UserInfo> user_info)
 {
     _user_info = user_info;
-        //设置ui界面
+    // 设置ui界面
     ui->title_lb->setText(_user_info->_name);
     ui->chat_data_list->removeAllItem();
-    for(auto & msg : user_info->_chat_msgs){
+    for (auto &msg : user_info->_chat_msgs)
+    {
         AppendChatMsg(msg);
     }
 }
@@ -35,7 +40,32 @@ void ChatPage::AppendChatMsg(std::shared_ptr<TextChatData> msg)
 {
     auto self_info = UserMgr::GetInstance()->GetUserInfo();
     ChatRole role;
-    //todo... 添加聊天显示
+    if (msg->_from_uid == self_info->_uid)
+    {
+        role = ChatRole::Self;
+        // 自己信息
+        ChatItemBase *pChatItem = new ChatItemBase(role);
+        pChatItem->SetUserName(self_info->_name);
+        pChatItem->SetUserIcon(QPixmap(self_info->_icon));
+        QWidget *pBubble = new TextBubble(role, msg->_msg_content);
+        pChatItem->SetBubble(pBubble); // 消息气泡
+        ui->chat_data_list->AppendChatItem(pChatItem);
+    }
+    else
+    {
+        role = ChatRole::Other;
+        ChatItemBase *pChatItem = new ChatItemBase(role);
+        auto friend_info = UserMgr::GetInstance()->GetFriendById(msg->_from_uid);
+        if (!friend_info)
+        {
+            return;
+        }
+        pChatItem->SetUserName(friend_info->_name);
+        pChatItem->SetUserIcon(QPixmap(friend_info->_icon));
+        QWidget *pBubble = new TextBubble(role, msg->_msg_content);
+        pChatItem->SetBubble(pBubble);
+        ui->chat_data_list->AppendChatItem(pChatItem);
+    }
 }
 
 void ChatPage::paintEvent(QPaintEvent *event)
@@ -64,40 +94,104 @@ void ChatPage::initSignals()
 
 void ChatPage::clearItems()
 {
+    ui->chat_data_list->removeAllItem();
+}
 
+void ChatPage::processMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo> &user_info, QJsonArray &textArray, int &txt_size)
+{
+    ChatRole role = ChatRole::Self;
+    QString userName = user_info->_name;
+    QString userIcon = user_info->_icon;
+
+    ChatItemBase *pChatItem = new ChatItemBase(role);
+    pChatItem->SetUserName(userName);
+    pChatItem->SetUserIcon(QPixmap(userIcon));
+    QWidget *pBubble = nullptr;
+    auto msgType = msg.msgFlag;
+
+    if (msgType == MsgType::Text)
+    {
+        pBubble = handleTextMessage(msg, user_info, textArray, txt_size);
+    }
+    else if (msgType == MsgType::Image)
+    {
+        pBubble = new PictureBubble(QPixmap(msg.content), role);
+    }
+    else if (msgType == MsgType::File)
+    {
+        // Handle file messages if needed
+    }
+
+    if (pBubble)
+    {
+        pChatItem->SetBubble(pBubble);
+        ui->chat_data_list->AppendChatItem(pChatItem);
+    }
+}
+
+QWidget *ChatPage::handleTextMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo> &user_info, QJsonArray &textArray, int &txt_size)
+{
+    QWidget *pBubble = new TextBubble(ChatRole::Self, msg.content);
+
+    if (txt_size + msg.content.length() > MAX_MSG_CONTENT_LEN)
+    {
+        sendChatData(user_info->_uid, _user_info->_uid, textArray);
+        txt_size = 0;
+        textArray = QJsonArray();
+    }
+
+    QUuid uuid = QUuid::createUuid();
+    QString uuid_str = uuid.toString();
+    QJsonObject obj;
+    QByteArray utf8Message = msg.content.toUtf8();
+    obj["content"] = QString::fromUtf8(utf8Message);
+    obj["msgid"] = uuid_str;
+    textArray.append(obj);
+
+    auto txt_msg = std::make_shared<TextChatData>(uuid_str, utf8Message, user_info->_uid, _user_info->_uid);
+    emit sig_append_send_chat_msg(txt_msg);
+
+    txt_size += msg.content.length();
+    return pBubble;
+}
+
+void ChatPage::sendChatData(int fromUid, int toUid, QJsonArray &textArray)
+{
+    QJsonObject textObj;
+    textObj["fromuid"] = fromUid;
+    textObj["touid"] = toUid;
+    textObj["text_array"] = textArray;
+
+    QJsonDocument doc(textObj);
+    QByteArray jsonData = doc.toJson(QJsonDocument::Compact);
+
+    emit TcpMgr::GetInstance()->sig_send_data(RequestId::ID_TEXT_CHAT_MSG_REQ, jsonData);
 }
 
 void ChatPage::on_send_btn_clicked()
 {
-    auto *pTextEdit = ui->chat_edit;
-    ChatRole role = ChatRole::Self;
-    QString userName = QStringLiteral("旻山君");
-    QString userIcon = ":/images/head_1.png";
-
-    const auto &msgList = pTextEdit->getMsgList();
-    for (int i = 0; i < msgList.size(); ++i)
+    if (_user_info == nullptr)
     {
-        auto type = msgList[i].msgFlag;
-        ChatItemBase *pChatItem = new ChatItemBase(role);
-        pChatItem->SetUserName(userName);
-        pChatItem->SetUserIcon(QPixmap(userIcon));
-        QWidget *pBubble = nullptr;
-        if (type == MsgType::Text)
+        qDebug() << "friend_info is empty";
+        return;
+    }
+
+    auto user_info = UserMgr::GetInstance()->GetUserInfo();
+    const auto &msgList = ui->chat_edit->getMsgList();
+
+    QJsonArray textArray;
+    int txt_size = 0;
+
+    for (const auto &msg : msgList)
+    {
+        if (msg.content.length() > MAX_MSG_CONTENT_LEN)
         {
-            pBubble = new TextBubble(role, msgList[i].content);
-        }
-        else if (type == MsgType::Image)
-        {
-            pBubble = new PictureBubble(QPixmap(msgList[i].content), role);
-        }
-        else if (type == MsgType::File)
-        {
+            qDebug() << "msg content is too long";
+            continue;
         }
 
-        if (pBubble)
-        {
-            pChatItem->SetBubble(pBubble);
-            ui->chat_data_list->AppendChatItem(pChatItem);
-        }
+        processMessage(msg, user_info, textArray, txt_size);
     }
+
+    sendChatData(user_info->_uid, _user_info->_uid, textArray);
 }

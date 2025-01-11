@@ -41,5 +41,16 @@
         <file>images/red_point.png</file>
         <file>images/tipclose.png</file>
         <file>images/add_friend.png</file>
+        <file>images/female.png</file>
+        <file>images/male.png</file>
+        <file>images/msg_chat_hover.png</file>
+        <file>images/msg_chat_normal.png</file>
+        <file>images/msg_chat_press.png</file>
+        <file>images/video_chat_hover.png</file>
+        <file>images/video_chat_normal.png</file>
+        <file>images/video_chat_press.png</file>
+        <file>images/voice_chat_hover.png</file>
+        <file>images/voice_chat_normal.png</file>
+        <file>images/voice_chat_press.png</file>
     </qresource>
 </RCC>

@@ -748,3 +748,55 @@ ApplyFriendItem #addBtn[state='press'] {
     font-size: 14px;
     background: #f7f7f8;
 }
+
+/* 好友信息页面 */
+#friend_info_page #name_lb {
+    color: #161616;
+    font-size: 18px;
+    font-family: "Microsoft YaHei";
+}
+
+#friend_info_page #nick_tip,
+#friend_info_page #nick_lb,
+#friend_info_page #bak_lb,
+#friend_info_page #bak_tip {
+    color: #161616;
+    font-size: 14px;
+    font-family: "Microsoft YaHei";
+}
+
+#msg_chat[state='normal'] {
+    border-image: url(:/images/msg_chat_normal.png);
+}
+
+#msg_chat[state='hover'] {
+    border-image: url(:/images/msg_chat_hover.png);
+}
+
+#msg_chat[state='press'] {
+    border-image: url(:/images/msg_chat_press.png);
+}
+
+#video_chat[state='normal'] {
+    border-image: url(:/images/video_chat_normal.png);
+}
+
+#video_chat[state='hover'] {
+    border-image: url(:/images/video_chat_hover.png);
+}
+
+#video_chat[state='press'] {
+    border-image: url(:/images/video_chat_press.png);
+}
+
+#voice_chat[state='normal'] {
+    border-image: url(:/images/voice_chat_normal.png);
+}
+
+#voice_chat[state='hover'] {
+    border-image: url(:/images/voice_chat_hover.png);
+}
+
+#voice_chat[state='press'] {
+    border-image: url(:/images/voice_chat_press.png);
+}

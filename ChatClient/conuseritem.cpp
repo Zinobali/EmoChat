@@ -59,3 +59,8 @@ void ConUserItem::ShowRedPoint(bool show)
 {
     ui->red_point->setVisible(show);
 }
+
+std::shared_ptr<UserInfo> ConUserItem::GetInfo()
+{
+    return _info;
+}

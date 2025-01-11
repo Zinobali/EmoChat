@@ -35,7 +35,7 @@ protected:
 private:
     void initUI();
     void initSignals();
-    void addChatUserList();
+    void addChatUserList(); // 添加聊天用户列表
     void setSideBarUserHead(const QString &headUrl);
     void clearOtherLabelState(StateWidget *w);
     void handleGlobalMousePress(QMouseEvent *event);
@@ -51,6 +51,11 @@ private slots:
     // void slot_sidebar_widget_clicked(StateWidget *label);
     void slot_side_chat_clicked();
     void slot_side_contact_clicked();
+    void slot_friend_info_page(std::shared_ptr<UserInfo> user_info);
+    void slot_switch_apply_friend_page();
+    void slot_jump_chat_item_from_friend_info_page(std::shared_ptr<UserInfo> user_info);
+    void slot_chat_item_clicked(QListWidgetItem *item);
+    void slot_append_send_chat_msg(std::shared_ptr<TextChatData> msg);
 
 public slots:
     void slot_friend_apply(std::shared_ptr<AddFriendApply> apply); // 收到好友申请消息
