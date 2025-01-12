@@ -28,6 +28,7 @@ public:
     ~ChatDialog();
     void ShowSearch(bool show);
     void AddLabelGroup(StateWidget *label);
+    void UpdateChatMsg(std::vector<std::shared_ptr<TextChatData>> msgdata);
 
 protected:
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
@@ -56,6 +57,7 @@ private slots:
     void slot_jump_chat_item_from_friend_info_page(std::shared_ptr<UserInfo> user_info);
     void slot_chat_item_clicked(QListWidgetItem *item);
     void slot_append_send_chat_msg(std::shared_ptr<TextChatData> msg);
+    void slot_text_chat_msg(std::shared_ptr<TextChatMsg> msg);
 
 public slots:
     void slot_friend_apply(std::shared_ptr<AddFriendApply> apply); // 收到好友申请消息

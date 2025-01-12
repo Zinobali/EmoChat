@@ -10,11 +10,12 @@
 #include <QRandomGenerator>
 
 static std::vector<QString> strs = {
-    "hello world !",
-    "nice to meet u",
-    "New year，new life",
-    "You have to love yourself",
-    "My love is written in the wind ever since the whole world is you"};
+    "慢品人间烟火色，闲观万事岁月长。",
+    "追赶日出就算我献给自己的浪漫。",
+    "生活不在别处，当下即是全部。",
+    "永远热爱，永远期待，永远浪漫。",
+    "向着光的方向，肆意生长。",
+    "把烦心事丢掉，腾出地方装鲜花。"};
 
 static std::vector<QString> heads = {
     ":/images/head_1.png",
@@ -27,14 +28,17 @@ static std::vector<QString> heads = {
     ":/images/head_8.png"};
 
 static std::vector<QString> names = {
-    "llfc",
-    "zack",
-    "golang",
-    "cpp",
-    "java",
-    "nodejs",
-    "python",
-    "rust"};
+    "James",
+    "John",
+    "Robert",
+    "Michael",
+    "David",
+    "Emma",
+    "Olivia",
+    "Ava",
+    "Isabella",
+    "Sophia"
+};
 
 extern std::function<void(QWidget *)> repolish;
 

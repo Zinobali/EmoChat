@@ -51,6 +51,7 @@ private:
     bool GetFriendApplyInfo(int to_uid, std::vector<std::shared_ptr<ApplyInfo>>& apply_list);
     void AuthFriendApplyHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
     bool GetFriendList(int self_id, std::vector<std::shared_ptr<UserInfo>>& user_list);
+    void ChatTextMsgHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data);
 
 private:
     std::thread worker_thread_;

@@ -60,6 +60,42 @@ AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(std::string server_ip, const Auth
     return response;
 }
 
+TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(std::string server_ip, const TextChatMsgReq& request, const Json::Value& return_value) {
+    // 准备回复
+    TextChatMsgRsp response;
+    response.set_error(ErrorCodes::Success);
+    Defer defer([&response, &request]() {
+        response.set_from_uid(request.from_uid());
+        response.set_to_uid(request.to_uid());
+        for (const auto& text_data : request.text_msgs()) {
+            auto* new_msg = response.add_text_msgs();
+            new_msg->set_msg_id(text_data.msg_id());
+            new_msg->set_msg_content(text_data.msg_content());
+        }
+        });
+
+    // 判断rpc服务器是否连接
+    auto find_iter = pools_.find(server_ip);
+    if (find_iter == pools_.end()) {
+        return response;
+    }
+
+    auto& pool = find_iter->second;
+    ClientContext context;
+    auto stub = pool->GetConnection();
+    Defer release_conn([&pool, &stub]() {
+        pool->ReleaseConnection(std::move(stub));
+        });
+
+    Status status = stub->NotifyTextChatMsg(&context, request, &response);
+    if (!status.ok()) {
+        response.set_error(ErrorCodes::RPCFailed);
+        return response;
+    }
+
+    return response;
+}
+
 ChatGrpcClient::ChatGrpcClient() {
     auto& config = ConfigMgr::GetInstance();
     auto server_list = config["PeerServer"]["Servers"];

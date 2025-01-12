@@ -75,9 +75,37 @@ Status ChatServiceImpl::NotifyAuthFriend(ServerContext* context, const AuthFrien
 }
 
 Status ChatServiceImpl::NotifyTextChatMsg(ServerContext* context, const TextChatMsgReq* request, TextChatMsgRsp* response) {
-    // todo ...
+    // 查找是否在本服务器
+    auto to_uid = request->to_uid();
+    auto session = UserMgr::GetInstance()->GetSession(to_uid);
+    response->set_error(ErrorCodes::Success);
 
-    return Status();
+    // 不在线直接返回
+    if (!session) {
+        return Status::OK;
+    }
+
+    // todo ...优化，发送到redis，然后由redis触发
+
+    // 在线就准备发送
+    Json::Value return_value;
+    return_value["error"] = ErrorCodes::Success;
+    return_value["fromuid"] = request->from_uid();
+    return_value["touid"] = request->to_uid();
+
+    // 准备数组
+    Json::Value text_array;
+    for (auto& msg : request->text_msgs()) {
+        Json::Value element;
+        element["content"] = msg.msg_content();
+        element["msgid"] = msg.msg_id();
+        text_array.append(element);
+    }
+    return_value["text_array"] = text_array;
+
+    // 发送
+    session->Send(MSG_IDS::ID_NOTIFY_TEXT_CHAT_MSG_REQ, return_value.toStyledString());
+    return Status::OK;
 }
 
 bool ChatServiceImpl::GetBaseInfo(const std::string& base_key, int uid, std::shared_ptr<UserInfo>& userinfo) {

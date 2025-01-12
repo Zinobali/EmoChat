@@ -102,9 +102,9 @@ void ApplyFriend::initUi()
     ui->input_tip_wid->hide();
     ui->input_tip_wid->hide();
     _tip_cur_point = QPoint(5, 5);
-    _tip_data = {"同学", "家人", "菜鸟教程", "C++ Primer", "Rust 程序设计",
-                 "父与子学Python", "nodejs开发指南", "go 语言开发指南",
-                 "游戏伙伴", "金融投资", "微信读书", "拼多多拼友"};
+    _tip_data = {"同事", "好友", "得到 APP", "Java 核心技术", "Swift 编程入门",
+                 "零基础学数据分析", "AI 绘画教程", "区块链技术指南",
+                 "运动搭子", "摄影爱好", "Kindle 阅读", "淘宝淘友"};
     ui->scrollArea->horizontalScrollBar()->setHidden(true);
     ui->scrollArea->verticalScrollBar()->setHidden(true);
     ui->scrollArea->installEventFilter(this);

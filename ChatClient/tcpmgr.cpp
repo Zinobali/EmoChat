@@ -63,6 +63,12 @@ void TcpMgr::initHandlers()
     // 认证好友回包
     handlers_.insert(RequestId::ID_AUTH_FRIEND_RSP, [this](RequestId id, QByteArray data)
                      { handleAuthFriendRsp(id, data); });
+    // 文本消息发送回包
+    handlers_.insert(RequestId::ID_TEXT_CHAT_MSG_RSP, [this](RequestId id, QByteArray data)
+                     { handleTextChatMsgRsp(id, data); });
+    // 对方消息通知
+    handlers_.insert(RequestId::ID_NOTIFY_TEXT_CHAT_MSG_REQ, [this](RequestId id, QByteArray data)
+                     { handleNotifyTextChatMsgReq(id, data); });
 }
 
 void TcpMgr::handleRead()
@@ -300,6 +306,54 @@ void TcpMgr::handleAuthFriendRsp(RequestId id, QByteArray data)
 
     auto auth_rsp = std::make_shared<AuthRsp>(uid, name, nick, icon, sex);
     emit sig_auth_rsp(auth_rsp);
+}
+
+void TcpMgr::handleTextChatMsgRsp(RequestId id, QByteArray data)
+{
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
+    {
+        qDebug() << "handle text chat message Failed, failed to parse json.";
+        return;
+    }
+
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
+    {
+        qDebug() << "handle text chat message Failed, err is " << jsonObj["error"].toInt();
+        return;
+    }
+
+    // todo ... 体验优化，发送消息转圈加载动画，收到此回包，结束动画。
+}
+
+void TcpMgr::handleNotifyTextChatMsgReq(RequestId id, QByteArray data)
+{
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
+    {
+        qDebug() << "handle notify text chat message Failed, failed to parse json.";
+        return;
+    }
+
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
+    {
+        qDebug() << "handle notify text chat message Failed, err is " << jsonObj["error"].toInt();
+        return;
+    }
+
+    // 组织消息
+    auto msg_ptr = std::make_shared<TextChatMsg>(
+        jsonObj["fromuid"].toInt(),
+        jsonObj["touid"].toInt(),
+        jsonObj["text_array"].toArray()
+        );
+    emit sig_text_chat_msg(msg_ptr);
 }
 
 bool TcpMgr::parseJson(const QByteArray &data, QJsonObject &obj)

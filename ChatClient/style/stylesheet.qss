@@ -210,7 +210,7 @@ QScrollBar::sub-page:vertical {
 }
 
 #send_widget {
-    background: #ffffff;
+    background: #f0f0f0;
     border: none;
 }
 
@@ -263,17 +263,17 @@ QScrollBar::sub-page:vertical {
 }
 
 #tool_widget {
-    background: #ffffff;
+    background: #f0f0f0;
     border-top: 0.5px solid #ececec;
 }
 
 #title_widget {
-    background: #ffffff;
+    background: #f0f0f0;
     border-bottom: 0.5px solid #ececec;
 }
 
 #chat_edit {
-    background: #ffffff;
+    background: #f0f0f0;
     border: none;
     font-family: "Microsoft YaHei";
     font-size: 18px;
@@ -281,7 +281,7 @@ QScrollBar::sub-page:vertical {
 }
 
 #chat_bg {
-    background: #ffffff;
+    background: #f0f0f0;
     border: none;
 }
 
