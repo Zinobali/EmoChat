@@ -60,6 +60,14 @@ int CSession::GetUserId() {
     return user_id_;
 }
 
+void CSession::UpdateLastActiveTime() {
+    last_active_time_ = std::chrono::system_clock::now();
+}
+
+const std::chrono::time_point<std::chrono::system_clock>& CSession::GetLastActiveTime() {
+    return last_active_time_;
+}
+
 void CSession::AsyncReadHead() {
     recv_head_node_->Clear();
     auto self(shared_from_this()); // 保证当前对象的生命周期

@@ -37,8 +37,7 @@ static std::vector<QString> names = {
     "Olivia",
     "Ava",
     "Isabella",
-    "Sophia"
-};
+    "Sophia"};
 
 extern std::function<void(QWidget *)> repolish;
 
@@ -76,6 +75,8 @@ enum RequestId
     ID_TEXT_CHAT_MSG_REQ = 1017,        // 文本聊天信息请求
     ID_TEXT_CHAT_MSG_RSP = 1018,        // 文本聊天信息回复
     ID_NOTIFY_TEXT_CHAT_MSG_REQ = 1019, // 通知用户文本聊天信息
+    ID_HEARTBEAT_REQ = 1020,            // 心跳请求
+    ID_HEARTBEAT_RSP = 1021,            // 心跳回复
 };
 
 enum Modules

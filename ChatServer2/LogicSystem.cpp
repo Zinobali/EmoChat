@@ -66,6 +66,10 @@ void LogicSystem::RegisterHandlers() {
     handlers_[MSG_IDS::ID_TEXT_CHAT_MSG_REQ] = [this](std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
         ChatTextMsgHandler(session, msg_id, msg_data);
         };
+    // 心跳请求
+    handlers_[MSG_IDS::ID_HEARTBEAT_REQ] = [this](std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
+        HeartBeatHandler(session, msg_id, msg_data);
+        };
 }
 
 void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
@@ -98,6 +102,8 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session, const uint16_t
     }
     // 验证通过
     return_value["error"] = ErrorCodes::Success;
+    // 绑定session和uid
+    session->SetUserId(uid);
 
     // 从redis或mysql获取用户信息
     auto base_key = USER_BASE_INFO + uid_str;
@@ -578,4 +584,24 @@ void LogicSystem::ChatTextMsgHandler(std::shared_ptr<CSession> session, const ui
     }
 
     ChatGrpcClient::GetInstance()->NotifyTextChatMsg(to_ip_value, text_msg_req, return_value);
+}
+
+void LogicSystem::HeartBeatHandler(std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(msg_data, root);
+
+    auto uid = root["uid"].asInt();
+    auto token = root["token"].asString();
+
+    if (session->GetUserId() != uid) {
+        return;
+    }
+
+    // todo ... 从redis获取token并验证
+
+    session->UpdateLastActiveTime();
+    Json::Value return_value;
+    return_value["error"] = ErrorCodes::Success;
+    session->Send(MSG_IDS::ID_HEARTBEAT_RSP, return_value.toStyledString());
 }

@@ -7,6 +7,7 @@ CServer::CServer(net::io_context& ioc, const USHORT& port)
     acceptor_(ioc, tcp::endpoint(tcp::v4(), port)) {
     std::cout << "Chat Server1 started on port: " << acceptor_.local_endpoint().port() << std::endl;
     StartAccept();
+    //StartCheckDeadSessions();
 }
 
 CServer::~CServer() {
@@ -23,6 +24,15 @@ void CServer::ClearSession(std::string sess_id) {
         std::lock_guard<std::mutex> lock(sess_mtx_);
         sessions_.erase(sess_id);
     }
+}
+
+Session_Iterator CServer::ClearSession(Session_Iterator& it) {
+    //移除用户和session的关联
+    UserMgr::GetInstance()->RemoveUserSession(it->second->GetUserId());
+
+    std::lock_guard<std::mutex> lock(sess_mtx_);
+    return sessions_.erase(it);
+
 }
 
 void CServer::StartAccept() {
@@ -47,4 +57,33 @@ void CServer::HandleAccept(std::shared_ptr<CSession> new_session, const boost::s
         sessions_.emplace(new_session->GetSessionId(), new_session);
     }
     StartAccept();
+}
+
+void CServer::checkDeadSessions() {
+    std::lock_guard<std::mutex> lock(sess_mtx_);
+    // 遍历map
+    for (auto it = sessions_.begin(); it != sessions_.end();) {
+        auto last_active_time = it->second->GetLastActiveTime();
+        auto now = std::chrono::system_clock::now();
+        if (last_active_time + std::chrono::seconds(45) < now) {
+            // 45s没有活跃，则关闭session
+            it->second->Close();
+            it = ClearSession(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void CServer::StartCheckDeadSessions() {
+    if (sessions_.empty()) {
+        return;
+    }
+    // 调用轮询函数，每 10 到 15 秒
+    std::thread([this] {
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(15));
+            checkDeadSessions();
+        }
+        }).detach();
 }

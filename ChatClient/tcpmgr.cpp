@@ -4,8 +4,17 @@
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
-
 #include "usermgr.h"
+
+TcpMgr::~TcpMgr()
+{
+    // 关闭心跳定时器
+    if (heartbeat_timer_ != nullptr)
+    {
+        heartbeat_timer_->stop();
+        heartbeat_timer_->deleteLater();
+    }
+}
 
 TcpMgr::TcpMgr(QObject *parent)
     : QObject{parent}, host_(""), port_(0), b_recv_pending_(false), msg_id_(0), msg_len_(0)
@@ -24,8 +33,8 @@ void TcpMgr::initSignals()
 
     connect(&socket_, &QTcpSocket::errorOccurred, this, [&](auto error)
             {
-        Q_UNUSED(error);
-        qDebug() << "Error:" << socket_.errorString(); });
+                Q_UNUSED(error);
+                qDebug() << "Error:" << socket_.errorString(); });
 
     connect(&socket_, &QTcpSocket::disconnected, this, [&]()
             { qDebug() << "Disconnected from server."; });
@@ -69,6 +78,9 @@ void TcpMgr::initHandlers()
     // 对方消息通知
     handlers_.insert(RequestId::ID_NOTIFY_TEXT_CHAT_MSG_REQ, [this](RequestId id, QByteArray data)
                      { handleNotifyTextChatMsgReq(id, data); });
+    // 心跳回包
+    handlers_.insert(RequestId::ID_HEARTBEAT_RSP, [this](RequestId id, QByteArray data)
+                     { handleHeartbeatRsp(id, data); });
 }
 
 void TcpMgr::handleRead()
@@ -155,6 +167,8 @@ void TcpMgr::handleChatLoginRsp(RequestId id, QByteArray data)
     }
 
     emit sig_switch_chatdlg();
+    // 登录成功，应该建立心跳机制
+    startHeartbeat();
 }
 
 void TcpMgr::handleMsg(RequestId id, QByteArray data)
@@ -351,9 +365,37 @@ void TcpMgr::handleNotifyTextChatMsgReq(RequestId id, QByteArray data)
     auto msg_ptr = std::make_shared<TextChatMsg>(
         jsonObj["fromuid"].toInt(),
         jsonObj["touid"].toInt(),
-        jsonObj["text_array"].toArray()
-        );
+        jsonObj["text_array"].toArray());
     emit sig_text_chat_msg(msg_ptr);
+}
+
+void TcpMgr::startHeartbeat(int interval)
+{
+    heartbeat_timer_ = new QTimer(this);
+    connect(heartbeat_timer_, &QTimer::timeout, this, &TcpMgr::slot_heartbeat_req);
+    heartbeat_timer_->start(interval);
+}
+
+void TcpMgr::handleHeartbeatRsp(RequestId id, QByteArray data)
+{
+    // 解析json
+    QJsonObject jsonObj;
+    if (!parseJson(data, jsonObj))
+    {
+        qDebug() << "handle heartbeat response Failed, failed to parse json.";
+        return;
+    }
+
+    // 检查错误码
+    ErrorCodes error;
+    if (!checkErrorCode(jsonObj, error))
+    {
+        qDebug() << "handle heartbeat response Failed, err is " << jsonObj["error"].toInt();
+        // todo ...断开连接，退出登录
+        return;
+    }
+
+    qDebug() << "Heartbeat Success";
 }
 
 bool TcpMgr::parseJson(const QByteArray &data, QJsonObject &obj)
@@ -402,4 +444,14 @@ void TcpMgr::slot_send_data(RequestId reqId, QByteArray dataBytes)
     block.append(dataBytes);                  // 将数据体追加到缓冲区,而不是使用数据流，避免数据体被转换字节序
     socket_.write(block);
     qDebug() << "tcp mgr send byte data is " << block;
+}
+
+void TcpMgr::slot_heartbeat_req()
+{
+    QJsonObject jsonObj;
+    jsonObj["uid"] = UserMgr::GetInstance()->uid();
+    jsonObj["token"] = UserMgr::GetInstance()->token();
+    QJsonDocument doc(jsonObj);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    emit sig_send_data(RequestId::ID_HEARTBEAT_REQ, data);
 }

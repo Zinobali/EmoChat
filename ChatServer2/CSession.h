@@ -9,6 +9,7 @@
 #include "global.h"
 #include <mutex>
 #include <queue>
+#include <chrono>
 
 constexpr size_t MAX_SENDQUE = 1024;
 
@@ -31,6 +32,8 @@ public:
     void Send(const uint16_t& msg_id, const std::string& msg);
     void SetUserId(int user_id);
     int GetUserId();
+    void UpdateLastActiveTime();
+    const std::chrono::time_point<std::chrono::system_clock>& GetLastActiveTime();
 
 
 private:
@@ -53,7 +56,7 @@ private:
     std::queue<std::shared_ptr<SendNode>> send_queue_;
     std::atomic_bool b_close_;
     int user_id_;
-
+    std::chrono::time_point<std::chrono::system_clock> last_active_time_;
     //net::steady_timer timeout_;
 };
 

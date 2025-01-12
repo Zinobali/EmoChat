@@ -7,6 +7,7 @@
 #include <QTcpSocket>
 #include <functional>
 #include <singleton.h>
+#include <QTimer>
 
 struct ServerInfo
 {
@@ -23,8 +24,10 @@ class TcpMgr : public QObject, public Singleton<TcpMgr>, public std::enable_shar
     friend class Singleton<TcpMgr>;
 
 public:
+    ~TcpMgr();
+
 private:
-    explicit TcpMgr(QObject *parent = nullptr);
+    explicit TcpMgr(QObject *parent = nullptr); // 私有化构造函数
     void initSignals();
     void initHandlers();
     void handleRead();
@@ -39,6 +42,8 @@ private:
     void handleAuthFriendRsp(RequestId id, QByteArray data);
     void handleTextChatMsgRsp(RequestId id, QByteArray data);
     void handleNotifyTextChatMsgReq(RequestId id, QByteArray data);
+    void startHeartbeat(int interval = 30000);
+    void handleHeartbeatRsp(RequestId id, QByteArray data);
 
 private:
     QTcpSocket socket_;
@@ -49,10 +54,14 @@ private:
     quint16 msg_id_;
     quint16 msg_len_;
     QMap<RequestId, TcpHandler> handlers_;
+    QTimer *heartbeat_timer_ = nullptr;
 
 public slots:
     void slot_tcp_connect(ServerInfo);
     void slot_send_data(RequestId reqId, QByteArray dataBytes);
+
+private slots:
+    void slot_heartbeat_req();
 
 signals:
     void sig_con_success(bool ok);
