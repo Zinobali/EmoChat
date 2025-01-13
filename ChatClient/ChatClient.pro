@@ -40,6 +40,7 @@ SOURCES += \
     httpmgr.cpp \
     listitembase.cpp \
     loadingdlg.cpp \
+    logicmgr.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
     resetdialog.cpp \
     searchlist.cpp \
     statewidget.cpp \
+    tcpfilemgr.cpp \
     tcpmgr.cpp \
     textbubble.cpp \
     timerbtn.cpp \
@@ -84,6 +86,7 @@ HEADERS += \
     httpmgr.h \
     listitembase.h \
     loadingdlg.h \
+    logicmgr.h \
     logindialog.h \
     mainwindow.h \
     msgtextedit.h \
@@ -93,6 +96,7 @@ HEADERS += \
     searchlist.h \
     singleton.h \
     statewidget.h \
+    tcpfilemgr.h \
     tcpmgr.h \
     textbubble.h \
     timerbtn.h \

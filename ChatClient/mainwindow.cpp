@@ -8,8 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // test_function(); // 测试函数，后续删除
-    // return; // test 测试函数，后续删除
+    test_function(); // 测试函数，后续删除
+    return; // test 测试函数，后续删除
 
     //创建一个CentralWidget, 并将其设置为MainWindow的中心部件
     _login_dlg = new LoginDialog(this);

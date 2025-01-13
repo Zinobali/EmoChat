@@ -9,7 +9,7 @@ constexpr int MAX_MSG_CONTENT_LEN = 1024;
 
 namespace Ui
 {
-class ChatPage;
+    class ChatPage;
 }
 struct MsgInfo;
 class ChatPage : public QWidget
@@ -27,19 +27,24 @@ protected:
 
 private slots:
     void on_send_btn_clicked();
+    void slot_file_label_clicked();
+
+    void on_receive_btn_clicked();
 
 private:
     void initUI();
     void initSignals();
     void clearItems();
-    void processMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo>& user_info, QJsonArray &textArray, int &txt_size);
-    QWidget *handleTextMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo>& user_info, QJsonArray &textArray, int &txt_size);
+    void processMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo> &user_info, QJsonArray &textArray, int &txt_size);
+    QWidget *handleTextMessage(const MsgInfo &msg, const std::shared_ptr<UserInfo> &user_info, QJsonArray &textArray, int &txt_size);
     void sendChatData(int fromUid, int toUid, QJsonArray &textArray);
 
 private:
     Ui::ChatPage *ui;
     std::shared_ptr<UserInfo> _user_info;
     QMap<QString, QWidget *> _bubble_map;
+    QString _file_name;
+    QString _file_md5;
 
 signals:
     void sig_append_send_chat_msg(std::shared_ptr<TextChatData> msg);

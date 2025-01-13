@@ -10,6 +10,10 @@
 #include <QUuid>
 #include "tcpmgr.h"
 #include <QJsonDocument>
+#include <QFileDialog>
+#include <QFile>
+#include <QCryptographicHash>
+#include "tcpfilemgr.h"
 
 ChatPage::ChatPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::ChatPage)
@@ -77,6 +81,23 @@ void ChatPage::paintEvent(QPaintEvent *event)
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
+void ChatPage::slot_file_label_clicked()
+{
+    // 打开文件对话框
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    "选择文件",
+                                                    "",
+                                                    "All Files (*);;Text Files (*.txt);;Image Files (*.png *.jpg);;PDF Files (*.pdf)");
+
+    if (!fileName.isEmpty())
+    {
+        // 缓存文件信息
+        qDebug() << "选择文件:" << fileName;
+        _file_name = fileName;
+        // todo ... 添加文件气泡
+    }
+}
+
 void ChatPage::initUI()
 {
     // 设置按钮样式
@@ -90,6 +111,8 @@ void ChatPage::initUI()
 void ChatPage::initSignals()
 {
     connect(ui->chat_edit, &MsgTextEdit::sig_send_msg, this, &ChatPage::on_send_btn_clicked);
+    // 打开文件
+    connect(ui->file_lb, &ClickedLabel::clicked, this, &ChatPage::slot_file_label_clicked);
 }
 
 void ChatPage::clearItems()
@@ -165,7 +188,7 @@ void ChatPage::sendChatData(int fromUid, int toUid, QJsonArray &textArray)
     QJsonDocument doc(textObj);
     QByteArray jsonData = doc.toJson(QJsonDocument::Compact);
 
-    emit TcpMgr::GetInstance()->sig_send_data(RequestId::ID_TEXT_CHAT_MSG_REQ, jsonData);
+    emit TcpMgr::GetInstance() -> sig_send_data(RequestId::ID_TEXT_CHAT_MSG_REQ, jsonData);
 }
 
 void ChatPage::on_send_btn_clicked()
@@ -194,4 +217,97 @@ void ChatPage::on_send_btn_clicked()
     }
 
     sendChatData(user_info->_uid, _user_info->_uid, textArray);
+}
+
+void ChatPage::on_receive_btn_clicked()
+{
+    // 这是测试按钮，并非接收按钮，当前功能是测试文件上传
+    if (_file_name.isEmpty())
+    {
+        return;
+    }
+
+    // 创建文件信息
+    QFileInfo file_info(_file_name);
+    int total_size = file_info.size();
+    // todo ... ui显示文件进度条
+    /*
+        ui->progressBar->setRange(0,total_size);
+        ui->progressBar->setValue(0);
+    */
+
+    // 发送文件
+    QFile file(_file_name);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "Failed to open file for reading: " << file.errorString();
+        return;
+    }
+
+    // 保存文件指针
+    qint64 originalPos = file.pos();
+    // QCryptographicHash hash(QCryptographicHash::Sha256);
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    if (!hash.addData(&file))
+    {
+        qWarning() << "Failed to add data to hash: " << file.errorString();
+        return;
+    }
+
+    _file_md5 = hash.result().toHex(); // 获取文件的MD5值
+
+    // 读取文件并发送
+    QByteArray buffer;
+    int seq = 0;
+
+    QString fileName = file_info.fileName(); // 获取文件名
+
+    int last_seq = 0;
+    if (total_size % MAX_BLOCK_LEN != 0)
+    {
+        last_seq = total_size / MAX_BLOCK_LEN + 1;
+    }
+    else
+    {
+        last_seq = total_size / MAX_BLOCK_LEN;
+    }
+
+    // 恢复指针位置
+    file.seek(originalPos);
+
+    // 发送文件
+    while (!file.atEnd())
+    {
+        buffer = file.read(MAX_BLOCK_LEN);
+
+        QJsonObject obj;
+        // 转换为base64
+        QString base64Data = buffer.toBase64();
+        ++seq;
+
+        obj["md5"] = _file_md5;
+        obj["name"] = fileName;
+        obj["seq"] = seq;
+        obj["trans_size"] = buffer.size() + (seq - 1) * MAX_BLOCK_LEN;
+        obj["total_size"] = total_size;
+
+        if (buffer.size() + (seq - 1) * MAX_BLOCK_LEN == total_size)
+        {
+            obj["last"] = 1;
+        }
+        else
+        {
+            obj["last"] = 0;
+        }
+
+        obj["data"] = base64Data;
+        obj["last_seq"] = last_seq;
+
+        QJsonDocument doc(obj);
+        auto send_data = doc.toJson(QJsonDocument::Compact);
+        TcpFileMgr::GetInstance()->SendMsg(RequestId::ID_UPLOAD_FILE_REQ, send_data);
+    }
+
+    // 关闭文件
+    file.close();
 }
