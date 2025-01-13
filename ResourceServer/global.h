@@ -1,0 +1,60 @@
+#pragma once
+#include <functional>
+
+constexpr char USERIPPREFIX[] = "uip_";
+constexpr char USERTOKENPREFIX[] = "utoken_";
+constexpr char IPCOUNTPREFIX[] = "ipcount_";
+constexpr char USER_BASE_INFO[] = "ubaseinfo_";
+constexpr char LOGIN_COUNT[] = "logincount_";
+constexpr char NAME_INFO[] = "nameinfo_";
+
+class Defer {
+public:
+    explicit Defer(std::function<void()>&& func) :func_(std::move(func)) {}
+    ~Defer() { func_(); }
+    Defer(const Defer&) = delete;
+    Defer& operator=(const Defer&) = delete;
+    Defer(Defer&& other) = default;
+
+private:
+    std::function<void()> func_;
+};
+
+enum ErrorCodes {
+    Success = 0,
+    Error_Json = 1001,  //Json解析错误
+    RPCFailed = 1002,  //RPC请求错误
+    VerifyExpired = 1003, //验证码过期
+    VerifyCodeErr = 1004, //验证码错误
+    UserExist = 1005,       //用户已经存在
+    PasswdErr = 1006,    //密码错误
+    EmailNotMatch = 1007,  //邮箱不匹配
+    PasswdUpFailed = 1008,  //更新密码失败
+    PasswdInvalid = 1009,   //密码验证失败
+    TokenInvalid = 1010,   //Token失效
+    UidInvalid = 1011,  //uid无效
+};
+
+enum MSG_IDS {
+    MSG_CHAT_LOGIN = 1005, //用户登陆
+    MSG_CHAT_LOGIN_RSP = 1006, //用户登陆回包
+    ID_SEARCH_USER_REQ = 1007, //用户搜索请求
+    ID_SEARCH_USER_RSP = 1008, //搜索用户回包
+    ID_ADD_FRIEND_REQ = 1009, //申请添加好友请求
+    ID_ADD_FRIEND_RSP = 1010, //申请添加好友回复
+    ID_NOTIFY_ADD_FRIEND_REQ = 1011,  //通知用户添加好友申请
+    ID_AUTH_FRIEND_REQ = 1013,  //认证好友请求
+    ID_AUTH_FRIEND_RSP = 1014,  //认证好友回复
+    ID_NOTIFY_AUTH_FRIEND_REQ = 1015, //通知用户认证好友申请
+    ID_TEXT_CHAT_MSG_REQ = 1017, //文本聊天信息请求
+    ID_TEXT_CHAT_MSG_RSP = 1018, //文本聊天信息回复
+    ID_NOTIFY_TEXT_CHAT_MSG_REQ = 1019, //通知用户文本聊天信息
+    ID_HEARTBEAT_REQ = 1020,            // 心跳请求
+    ID_HEARTBEAT_RSP = 1021,            // 心跳回复
+    ID_UPLOAD_FILE_REQ = 1022,          // 上传文件请求
+    ID_UPLOAD_FILE_RSP = 1023,          // 上传文件回复
+    ID_DOWNLOAD_FILE_REQ = 1024,        // 下载文件请求
+    ID_DOWNLOAD_FILE_RSP = 1025,        // 下载文件回复
+};
+
+

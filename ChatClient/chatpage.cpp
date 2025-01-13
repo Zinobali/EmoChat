@@ -96,6 +96,8 @@ void ChatPage::slot_file_label_clicked()
         _file_name = fileName;
         // todo ... 添加文件气泡
     }
+    // 测试连接到服务器
+    // TcpFileMgr::GetInstance()->ConnectToServer("127.0.0.1", 9090);
 }
 
 void ChatPage::initUI()
