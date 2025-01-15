@@ -23,10 +23,7 @@ void LogicSystem::DealMsg() {
         std::unique_lock<std::mutex> lock(que_mtx_);
         cv_.wait(lock, [this]() { return b_stop_ || !logic_que_.empty(); });
 
-        if (b_stop_) {
-            while (!logic_que_.empty()) {
-                HandleMsg();
-            }
+        if (b_stop_ && logic_que_.empty()) {
             return;
         }
 
@@ -48,7 +45,11 @@ void LogicSystem::PostMsgToQue(std::shared_ptr<LogicNode> logic_node) {
 void LogicSystem::RegisterHandlers() {
     // 登录
     handlers_[MSG_IDS::MSG_CHAT_LOGIN] = [this](std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {
-        LoginHandler(session, msg_id, msg_data);
+        // ThreadPool::GetInstance()->Commit(&LogicSystem::LoginHandler, this, session, msg_id, msg_data);
+        // 目前的理解是，Commit(&LogicSystem::LoginHandler, this, session, msg_id, msg_data);
+        // 这里的模板推断，好像会把函数理解为参数为this, session, msg_id, msg_data四个参数，导致编译通不过。
+        ThreadPool::GetInstance()->Commit(std::bind(&LogicSystem::LoginHandler, this, session, msg_id, msg_data));
+        //LoginHandler(session, msg_id, msg_data);
         };
     // 搜索好友
     handlers_[MSG_IDS::ID_SEARCH_USER_REQ] = [this](std::shared_ptr<CSession> session, const uint16_t& msg_id, const std::string& msg_data) {

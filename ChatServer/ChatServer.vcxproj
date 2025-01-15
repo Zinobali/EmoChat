@@ -143,6 +143,7 @@
     <ClCompile Include="MySQLMgr.cpp" />
     <ClCompile Include="RedisMgr.cpp" />
     <ClCompile Include="StatusGrpcClient.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="UserMgr.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,7 @@
     <ClInclude Include="RedisMgr.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="StatusGrpcClient.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="threadsafe_queue.h" />
     <ClInclude Include="UserMgr.h" />
   </ItemGroup>

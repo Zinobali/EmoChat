@@ -11,6 +11,7 @@
 #include <json/value.h>
 #include <json/reader.h>
 #include "data.h"
+#include "ThreadPool.h"
 
 class LogicNode
 {
@@ -29,6 +30,7 @@ typedef std::function<void(std::shared_ptr<CSession> session, const uint16_t& ms
 struct UserInfo;
 class LogicSystem : public Singleton<LogicSystem>
 {
+    friend class ThreadPool;
     friend class Singleton<LogicSystem>;
 
 public:
