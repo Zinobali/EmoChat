@@ -13,6 +13,8 @@
 #include "tcpmgr.h"
 #include "usermgr.h"
 #include "chatuseritem.h"
+#include "tcpfilemgr.h"
+#include "logicmgr.h"
 
 ChatDialog::ChatDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::ChatDialog), mode_(ChatUIMode::ChatMode), state_(ChatUIMode::ChatMode),
@@ -128,6 +130,8 @@ void ChatDialog::initSignals() {
     connect(ui->chat_page, &ChatPage::sig_append_send_chat_msg, this, &ChatDialog::slot_append_send_chat_msg);
     // 对端文本消息
     connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_text_chat_msg, this, &ChatDialog::slot_text_chat_msg);
+    // 链接tcp文件系统和逻辑系统信号槽
+    connect(TcpFileMgr::GetInstance().get(), &TcpFileMgr::sig_logic_process, LogicMgr::GetInstance().get(), &LogicMgr::sig_logic_process);
 }
 
 void ChatDialog::addChatUserList() {
